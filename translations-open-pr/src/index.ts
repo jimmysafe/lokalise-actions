@@ -5,6 +5,7 @@ import {
   Language,
   LokaliseApi,
   PaginatedResult,
+  QueuedProcess,
   Task,
   UserGroup,
 } from "@lokalise/node-api";
@@ -37,7 +38,7 @@ class Lokalise {
     return this.api.branches().create({ name: branch_name }, { project_id });
   }
 
-  public async upload(branch_name: string) {
+  public async upload(branch_name: string): Promise<string[]> {
     try {
       const folder = await octokit.rest.repos.getContent({
         ...request,
@@ -66,6 +67,7 @@ class Lokalise {
           .filter(Boolean)
       );
 
+      let processes = [];
       for (const file of base64Files) {
         const res = await this.api
           .files()
@@ -78,10 +80,12 @@ class Lokalise {
             tags: [branch_name],
             cleanup_mode: true, // enables deleted keys to be removed from file
           });
-        console.log("FILE UPLOAD: ", file.fileName, res.status);
+        if (res?.process_id) processes.push(res.process_id);
       }
+      return processes;
     } catch (error) {
       console.log(error);
+      return [];
     }
   }
 
@@ -123,6 +127,14 @@ class Lokalise {
     return this.api.languages().list({ project_id });
   }
 
+  public async getUploadProcessStatus(
+    process_id: string
+  ): Promise<QueuedProcess> {
+    return this.api
+      .queuedProcesses()
+      .get(process_id, { project_id: `${project_id}:${branch_name}` });
+  }
+
   private async getUpdatedBranchKeys(branch_name: string): Promise<number[]> {
     const res = await this.api.keys().list({
       project_id: `${project_id}:${branch_name}`,
@@ -146,21 +158,38 @@ class Lokalise {
 
 async function run() {
   try {
-    // Init class
     const lokalise = new Lokalise();
-    // Create branch
-    core.info("Creating branch...");
-    await lokalise.createBranch(branch_name);
-    core.info("Uploading files...");
-    // Upload files
-    await lokalise.upload(branch_name);
-    // Create task
-    core.info("Getting target languages...");
+
+    console.log("[CREATING BRANCH]");
+    const branch = await lokalise.createBranch(branch_name);
+    console.log("[BRANCH CREATED]: ", branch.branch_id);
+
+    console.log("[UPLOADING FILES]");
+    const processes = await lokalise.upload(branch_name);
+    console.log("[PROCESSED FILES]: ", processes);
+
+    console.log("[CHECKING PROCESS COMPLETION]");
+    let allCompleted = false;
+    do {
+      allCompleted = true;
+      for (const process of processes) {
+        const p = await lokalise.getUploadProcessStatus(process);
+        console.log(`[${p.process_id}] -> ${p.status.toUpperCase()}`);
+        if (p?.status !== "finished") {
+          allCompleted = false;
+        }
+      }
+    } while (!allCompleted);
+
+    console.log("[CREATE TASK X TARGET LANGUAGE]");
     const langs = await lokalise.getProjectLanguages();
     const targetLangs = langs.items.filter((lang) => lang.lang_iso !== "it");
+    console.log(`[TARGET LANGUAGES] -> ${targetLangs.map((l) => l.lang_iso)}`);
+
     for (const lang of targetLangs) {
-      core.info(`Creating ${lang.lang_iso.toUpperCase()} task...`);
+      console.log(`[CREATING ${lang.lang_iso.toUpperCase()} TASK]`);
       await lokalise.createTask(branch_name, lang.lang_iso);
+      console.log(`[SUCCESSFULLY CREATED ${lang.lang_iso.toUpperCase()} TASK]`);
     }
   } catch (err) {
     core.setFailed(err.message);
