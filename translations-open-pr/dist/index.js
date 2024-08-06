@@ -243,7 +243,7 @@ function run() {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales" }))];
+                    return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales/it" }))];
                 case 1:
                     res = _a.sent();
                     console.log(JSON.stringify(res, null, 2));
