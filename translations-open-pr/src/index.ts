@@ -1,4 +1,4 @@
-import * as core from "@actions/core";
+// import * as core from "@actions/core";
 import { getOctokit, context } from "@actions/github";
 // import path = require("path");
 

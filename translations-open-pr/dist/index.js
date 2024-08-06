@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// import * as core from "@actions/core";
 var github_1 = require("@actions/github");
 // import path = require("path");
 // const myToken = core.getInput("token");
