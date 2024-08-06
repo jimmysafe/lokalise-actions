@@ -122,7 +122,7 @@ var Lokalise = /** @class */ (function () {
                     case 1:
                         res = _a.sent();
                         zipUrl = res.bundle_url;
-                        __root = path.resolve();
+                        __root = ".";
                         __locales = path.join(__root, "locales");
                         __temp = path.join(__root, "temp");
                         return [4 /*yield*/, (0, node_fetch_1.default)(zipUrl)];
@@ -149,11 +149,13 @@ var Lokalise = /** @class */ (function () {
 }());
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var lokalise, root;
+        var lokalise, __root, __locales, root;
         return __generator(this, function (_a) {
             try {
                 lokalise = new Lokalise();
-                root = fs.readdirSync(".");
+                __root = ".";
+                __locales = path.join(__root, "locales");
+                root = fs.readdirSync(__locales);
                 console.log(root);
                 // await lokalise.mergeBranch({
                 //   branch_name,

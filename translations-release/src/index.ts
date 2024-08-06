@@ -76,7 +76,7 @@ class Lokalise {
       });
 
     const zipUrl = res.bundle_url;
-    const __root = path.resolve();
+    const __root = ".";
     const __locales = path.join(__root, "locales");
     const __temp = path.join(__root, "temp");
 
@@ -102,7 +102,9 @@ async function run() {
     const lokalise = new Lokalise();
     // Merge and delete branch
 
-    const root = fs.readdirSync(".");
+    const __root = ".";
+    const __locales = path.join(__root, "locales");
+    const root = fs.readdirSync(__locales);
     console.log(root);
 
     // await lokalise.mergeBranch({
