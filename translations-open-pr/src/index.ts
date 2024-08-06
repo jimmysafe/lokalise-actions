@@ -135,11 +135,49 @@ export class Lokalise {
 
 async function run() {
   try {
-    const res = await octokit.rest.repos.getContent({
+    const folder = await octokit.rest.repos.getContent({
       ...request,
-      path: "locales/it/auth.json",
+      path: "locales/it",
     });
-    console.log(JSON.stringify(res.data, null, 2));
+
+    const base64Files = await Promise.all(
+      (folder.data as any)
+        .map(async (f: any) => {
+          const file = await octokit.rest.repos.getContent({
+            ...request,
+            path: f.path,
+          });
+          if (!file) return null;
+          // @ts-expect-error
+          return { fileName: file.name, base64Content: file.content };
+        })
+        .filter(Boolean)
+    );
+
+    console.log(JSON.stringify(base64Files, null, 2));
+
+    // // Convert each JSON file to a Base64 string
+    // const base64Files = files.map((file) => {
+    //   const filePath = path.join(directoryPath, file);
+    //   const fileContent = fs.readFileSync(filePath, "utf-8");
+    //   const base64Content = Buffer.from(fileContent).toString("base64");
+    //   return { fileName: file, base64Content };
+    // });
+
+    // for (const file of base64Files) {
+    //   const res = await this.api
+    //     .files()
+    //     .upload(`${project_id}:${branch_name}`, {
+    //       format: "json",
+    //       lang_iso: "it",
+    //       data: file.base64Content,
+    //       filename: file.fileName,
+    //       replace_modified: true,
+    //       tags: [branch_name],
+    //       cleanup_mode: true, // enables deleted keys to be removed from file
+    //     });
+    //   console.log(file.fileName, res.status);
+    // }
 
     // // Init class
     // const lokalise = new Lokalise();

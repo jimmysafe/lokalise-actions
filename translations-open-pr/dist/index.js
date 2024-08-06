@@ -237,21 +237,40 @@ var Lokalise = /** @class */ (function () {
 exports.Lokalise = Lokalise;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var res, err_1;
+        var folder, base64Files, err_1;
+        var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales/it/auth.json" }))];
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales/it" }))];
                 case 1:
-                    res = _a.sent();
-                    console.log(JSON.stringify(res.data, null, 2));
-                    return [3 /*break*/, 3];
+                    folder = _a.sent();
+                    return [4 /*yield*/, Promise.all(folder.data
+                            .map(function (f) { return __awaiter(_this, void 0, void 0, function () {
+                            var file;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path }))];
+                                    case 1:
+                                        file = _a.sent();
+                                        if (!file)
+                                            return [2 /*return*/, null];
+                                        // @ts-expect-error
+                                        return [2 /*return*/, { fileName: file.name, base64Content: file.content }];
+                                }
+                            });
+                        }); })
+                            .filter(Boolean))];
                 case 2:
+                    base64Files = _a.sent();
+                    console.log(JSON.stringify(base64Files, null, 2));
+                    return [3 /*break*/, 4];
+                case 3:
                     err_1 = _a.sent();
                     core.setFailed(err_1.message);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
             }
         });
     });
