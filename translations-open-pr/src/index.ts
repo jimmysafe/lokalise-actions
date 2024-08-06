@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { context } from "@actions/github";
+import { getOctokit, context } from "@actions/github";
 import {
   Branch,
   Language,
@@ -16,9 +16,18 @@ import path = require("path");
 // - upload files
 // - create task
 
+const myToken = core.getInput("token");
+const octokit = getOctokit(myToken);
+
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
 const branch_name = context.payload.pull_request.head.ref;
+
+const request = {
+  owner: context.repo.owner,
+  repo: context.repo.repo,
+  ref: context.sha,
+};
 
 export class Lokalise {
   api: LokaliseApi;
@@ -130,9 +139,11 @@ export class Lokalise {
 
 async function run() {
   try {
-    core.info("ProjectId: " + project_id);
-    const __root = path.resolve();
-    core.info("Root: " + __root);
+    const res = await octokit.rest.repos.getContent({
+      ...request,
+      path: "locales",
+    });
+    console.log(JSON.stringify(res, null, 2));
     // const directoryPath = path.join(__root, "locales", "it");
 
     // const files = fs

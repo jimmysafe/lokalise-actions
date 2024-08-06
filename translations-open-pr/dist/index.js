@@ -6,6 +6,17 @@
 
 "use strict";
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -53,9 +64,16 @@ var path = __nccwpck_require__(1017);
 // - create branch
 // - upload files
 // - create task
+var myToken = core.getInput("token");
+var octokit = (0, github_1.getOctokit)(myToken);
 var apiKey = core.getInput("lokaliseApiToken");
 var project_id = core.getInput("lokaliseProjectId");
 var branch_name = github_1.context.payload.pull_request.head.ref;
+var request = {
+    owner: github_1.context.repo.owner,
+    repo: github_1.context.repo.repo,
+    ref: github_1.context.sha,
+};
 var Lokalise = /** @class */ (function () {
     function Lokalise() {
         this.api = new node_api_1.LokaliseApi({
@@ -220,37 +238,22 @@ var Lokalise = /** @class */ (function () {
 exports.Lokalise = Lokalise;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var __root;
+        var res, err_1;
         return __generator(this, function (_a) {
-            try {
-                core.info("ProjectId: " + project_id);
-                __root = path.resolve();
-                core.info("Root: " + __root);
-                // const directoryPath = path.join(__root, "locales", "it");
-                // const files = fs
-                //   .readdirSync(directoryPath)
-                //   .filter((file) => file.endsWith(".json"));
-                // // Init class
-                // const lokalise = new Lokalise();
-                // // Create branch
-                // core.info("Creating branch...");
-                // await lokalise.createBranch(branch_name);
-                // core.info("Uploading files...");
-                // // Upload files
-                // await lokalise.upload(branch_name);
-                // // Create task
-                // core.info("Getting target languages...");
-                // const langs = await lokalise.getProjectLanguages();
-                // const targetLangs = langs.items.filter((lang) => lang.lang_iso !== "it");
-                // for (const lang of targetLangs) {
-                //   core.info(`Creating ${lang.lang_iso.toUpperCase()} task...`);
-                //   await lokalise.createTask(branch_name, lang.lang_iso);
-                // }
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales" }))];
+                case 1:
+                    res = _a.sent();
+                    console.log(JSON.stringify(res, null, 2));
+                    return [3 /*break*/, 3];
+                case 2:
+                    err_1 = _a.sent();
+                    core.setFailed(err_1.message);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
             }
-            catch (err) {
-                core.setFailed(err.message);
-            }
-            return [2 /*return*/];
         });
     });
 }
