@@ -8,8 +8,6 @@ import {
   Task,
   UserGroup,
 } from "@lokalise/node-api";
-import * as fs from "fs";
-import path = require("path");
 
 //! STEPS:
 // - create branch
@@ -57,10 +55,18 @@ export class Lokalise {
             const file = await octokit.rest.repos.getContent({
               ...request,
               path: f.path,
+              mediaType: {
+                format: "raw",
+              },
             });
-            const _file = file?.data as any;
-            if (!_file?.content) return null;
-            return { fileName: _file.name, base64Content: _file.content };
+            const base64Content = Buffer.from(file.data.toString()).toString(
+              "base64"
+            );
+
+            return {
+              fileName: f.name,
+              base64Content,
+            };
           })
           .filter(Boolean)
       );
@@ -77,7 +83,7 @@ export class Lokalise {
             tags: [branch_name],
             cleanup_mode: true, // enables deleted keys to be removed from file
           });
-        console.log("UPLOADED: ", file.fileName, res.status);
+        console.log("FILE UPLOAD: ", file.fileName, res.status);
       }
     } catch (error) {
       console.log(error);

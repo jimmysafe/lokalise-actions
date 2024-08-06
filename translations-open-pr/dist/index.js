@@ -107,16 +107,19 @@ var Lokalise = /** @class */ (function () {
                         folder = _a.sent();
                         return [4 /*yield*/, Promise.all(folder.data
                                 .map(function (f) { return __awaiter(_this, void 0, void 0, function () {
-                                var file, _file;
+                                var file, base64Content;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
-                                        case 0: return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path }))];
+                                        case 0: return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path, mediaType: {
+                                                    format: "raw",
+                                                } }))];
                                         case 1:
                                             file = _a.sent();
-                                            _file = file === null || file === void 0 ? void 0 : file.data;
-                                            if (!(_file === null || _file === void 0 ? void 0 : _file.content))
-                                                return [2 /*return*/, null];
-                                            return [2 /*return*/, { fileName: _file.name, base64Content: _file.content }];
+                                            base64Content = Buffer.from(file.data.toString()).toString("base64");
+                                            return [2 /*return*/, {
+                                                    fileName: f.name,
+                                                    base64Content: base64Content,
+                                                }];
                                     }
                                 });
                             }); })
@@ -141,7 +144,7 @@ var Lokalise = /** @class */ (function () {
                             })];
                     case 4:
                         res = _a.sent();
-                        console.log("UPLOADED: ", file.fileName, res.status);
+                        console.log("FILE UPLOAD: ", file.fileName, res.status);
                         _a.label = 5;
                     case 5:
                         _i++;
