@@ -169,8 +169,10 @@ var Lokalise = /** @class */ (function () {
                         return [4 /*yield*/, this.getUpdatedBranchKeys(branch_name)];
                     case 2:
                         keys = _a.sent();
-                        if (!keys || keys.length === 0)
-                            return [2 /*return*/];
+                        if (!keys || keys.length === 0) {
+                            core.info("No ".concat(lang.toUpperCase(), " keys found for ").concat(branch_name, ".. skipping task creation."));
+                            return [2 /*return*/, null];
+                        }
                         return [2 /*return*/, this.api.tasks().create({
                                 title: "Update ".concat(lang.toUpperCase(), " - ").concat(branch_name),
                                 keys: keys,

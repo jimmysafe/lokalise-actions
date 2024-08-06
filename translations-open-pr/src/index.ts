@@ -94,7 +94,12 @@ class Lokalise {
       if (!group) throw new Error(`No user group found for ${lang}`);
 
       const keys = await this.getUpdatedBranchKeys(branch_name);
-      if (!keys || keys.length === 0) return;
+      if (!keys || keys.length === 0) {
+        core.info(
+          `No ${lang.toUpperCase()} keys found for ${branch_name}.. skipping task creation.`
+        );
+        return null;
+      }
       return this.api.tasks().create(
         {
           title: `Update ${lang.toUpperCase()} - ${branch_name}`,
