@@ -252,10 +252,11 @@ function run() {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
-                                        console.log("PROCESSING: ", JSON.stringify(f, null, 2));
+                                        console.log("PROCESSING: ", f.name);
                                         return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path }))];
                                     case 1:
                                         file = _a.sent();
+                                        console.log("FILE: ", JSON.stringify(file, null, 2));
                                         if (!file)
                                             return [2 /*return*/, null];
                                         // @ts-expect-error

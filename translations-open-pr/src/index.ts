@@ -143,11 +143,12 @@ async function run() {
     const base64Files = await Promise.all(
       (folder.data as any)
         .map(async (f: any) => {
-          console.log("PROCESSING: ", JSON.stringify(f, null, 2));
+          console.log("PROCESSING: ", f.name);
           const file = await octokit.rest.repos.getContent({
             ...request,
             path: f.path,
           });
+          console.log("FILE: ", JSON.stringify(file, null, 2));
           if (!file) return null;
           // @ts-expect-error
           return { fileName: file.name, base64Content: file.content };
