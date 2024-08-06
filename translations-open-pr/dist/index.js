@@ -169,7 +169,8 @@ var Lokalise = /** @class */ (function () {
                         return [4 /*yield*/, this.getUpdatedBranchKeys(branch_name)];
                     case 2:
                         keys = _a.sent();
-                        console.log("KEYS: ", keys);
+                        if (!keys || keys.length === 0)
+                            return [2 /*return*/];
                         return [2 /*return*/, this.api.tasks().create({
                                 title: "Update ".concat(lang.toUpperCase(), " - ").concat(branch_name),
                                 keys: keys,
