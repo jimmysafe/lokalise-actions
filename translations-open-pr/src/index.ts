@@ -117,10 +117,6 @@ export class Lokalise {
       project_id: `${project_id}:${branch_name}`,
       filter_tags: branch_name,
     });
-    console.log(
-      "KEYS: ",
-      res.items.map((key) => key.key_id)
-    );
     return res.items.map((key) => key.key_id);
   }
 
@@ -142,8 +138,17 @@ async function run() {
     const res = await octokit.rest.repos.getContent({
       ...request,
       path: "locales/it",
+      mediaType: {
+        format: "raw",
+      },
     });
     console.log(JSON.stringify(res, null, 2));
+
+    const files = fs
+      .readdirSync("locales/it")
+      .filter((file) => file.endsWith(".json"));
+
+    console.log("FILES:", files);
 
     // // Init class
     // const lokalise = new Lokalise();
