@@ -153,7 +153,7 @@ function run() {
         return __generator(this, function (_a) {
             try {
                 lokalise = new Lokalise();
-                root = fs.readdirSync("/");
+                root = fs.readdirSync(".");
                 console.log(root);
                 // await lokalise.mergeBranch({
                 //   branch_name,

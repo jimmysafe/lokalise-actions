@@ -102,7 +102,7 @@ async function run() {
     const lokalise = new Lokalise();
     // Merge and delete branch
 
-    const root = fs.readdirSync("/");
+    const root = fs.readdirSync(".");
     console.log(root);
 
     // await lokalise.mergeBranch({
