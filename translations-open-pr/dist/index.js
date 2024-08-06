@@ -57,6 +57,7 @@ function run() {
         return __generator(this, function (_a) {
             console.log("REQUEST: ", JSON.stringify(request, null, 2));
             console.log("GH CONTEXT: ", JSON.stringify(github_1.context, null, 2));
+            console.log("BRANCHNAME: ", github_1.context.payload.pull_request.head.ref);
             return [2 /*return*/];
         });
     });

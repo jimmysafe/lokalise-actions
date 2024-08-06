@@ -13,6 +13,7 @@ const request = {
 async function run() {
   console.log("REQUEST: ", JSON.stringify(request, null, 2));
   console.log("GH CONTEXT: ", JSON.stringify(context, null, 2));
+  console.log("BRANCHNAME: ", context.payload.pull_request.head.ref);
 }
 
 run();
