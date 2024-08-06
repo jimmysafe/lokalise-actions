@@ -14641,7 +14641,7 @@ const { Blob, File: NativeFile } = __nccwpck_require__(4300)
 const { kBodyUsed } = __nccwpck_require__(2785)
 const assert = __nccwpck_require__(9491)
 const { isErrored } = __nccwpck_require__(3983)
-const { isUint8Array, isArrayBuffer } = __nccwpck_require__(9830)
+const { isUint8Array, isArrayBuffer } = __nccwpck_require__(4978)
 const { File: UndiciFile } = __nccwpck_require__(8511)
 const { parseMIMEType, serializeAMimeType } = __nccwpck_require__(685)
 
@@ -21011,7 +21011,7 @@ const { getGlobalOrigin } = __nccwpck_require__(1246)
 const { performance } = __nccwpck_require__(4074)
 const { isBlobLike, toUSVString, ReadableStreamFrom } = __nccwpck_require__(3983)
 const assert = __nccwpck_require__(9491)
-const { isUint8Array } = __nccwpck_require__(9830)
+const { isUint8Array } = __nccwpck_require__(4978)
 
 let supportedHashes = []
 
@@ -29457,6 +29457,14 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 4978:
+/***/ ((module) => {
+
+module.exports = eval("require")("util/types");
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -29654,14 +29662,6 @@ module.exports = require("url");
 
 "use strict";
 module.exports = require("util");
-
-/***/ }),
-
-/***/ 9830:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("util/types");
 
 /***/ }),
 
@@ -31360,7 +31360,7 @@ class LokalisePkg {
     static async getVersion() {
         let pkg;
         try {
-            pkg = JSON.parse((await (0,promises_namespaceObject.readFile)(new URL(LokalisePkg.pkgPath(), import.meta.url))).toString());
+            pkg = JSON.parse((await (0,promises_namespaceObject.readFile)(new URL(LokalisePkg.pkgPath(), "file:///Users/basilico/projects/lokalise-actions/translations-open-pr/node_modules/@lokalise/node-api/dist/lokalise/pkg.js"))).toString());
         }
         catch (_e) {
             pkg = null;
