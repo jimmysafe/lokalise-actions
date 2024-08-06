@@ -46,20 +46,24 @@ export class Lokalise {
 
   public async upload(branch_name: string) {
     try {
-      const __root = path.resolve();
-      const directoryPath = path.join(__root, "locales", "it");
-
-      const files = fs
-        .readdirSync(directoryPath)
-        .filter((file) => file.endsWith(".json"));
-
-      // Convert each JSON file to a Base64 string
-      const base64Files = files.map((file) => {
-        const filePath = path.join(directoryPath, file);
-        const fileContent = fs.readFileSync(filePath, "utf-8");
-        const base64Content = Buffer.from(fileContent).toString("base64");
-        return { fileName: file, base64Content };
+      const folder = await octokit.rest.repos.getContent({
+        ...request,
+        path: "locales/it",
       });
+
+      const base64Files = await Promise.all(
+        (folder.data as any)
+          .map(async (f: any) => {
+            const file = await octokit.rest.repos.getContent({
+              ...request,
+              path: f.path,
+            });
+            const _file = file?.data as any;
+            if (!_file?.content) return null;
+            return { fileName: _file.name, base64Content: _file.content };
+          })
+          .filter(Boolean)
+      );
 
       for (const file of base64Files) {
         const res = await this.api
@@ -73,7 +77,7 @@ export class Lokalise {
             tags: [branch_name],
             cleanup_mode: true, // enables deleted keys to be removed from file
           });
-        console.log(file.fileName, res.status);
+        console.log("UPLOADED: ", file.fileName, res.status);
       }
     } catch (error) {
       console.log(error);
@@ -135,67 +139,22 @@ export class Lokalise {
 
 async function run() {
   try {
-    const folder = await octokit.rest.repos.getContent({
-      ...request,
-      path: "locales/it",
-    });
-
-    const base64Files = await Promise.all(
-      (folder.data as any)
-        .map(async (f: any) => {
-          console.log("PROCESSING: ", f.name);
-          const file = await octokit.rest.repos.getContent({
-            ...request,
-            path: f.path,
-          });
-          const _file = file?.data as any;
-          if (!_file?.content) return null;
-          return { fileName: _file.name, base64Content: _file.content };
-        })
-        .filter(Boolean)
-    );
-
-    console.log(JSON.stringify(base64Files, null, 2));
-
-    // // Convert each JSON file to a Base64 string
-    // const base64Files = files.map((file) => {
-    //   const filePath = path.join(directoryPath, file);
-    //   const fileContent = fs.readFileSync(filePath, "utf-8");
-    //   const base64Content = Buffer.from(fileContent).toString("base64");
-    //   return { fileName: file, base64Content };
-    // });
-
-    // for (const file of base64Files) {
-    //   const res = await this.api
-    //     .files()
-    //     .upload(`${project_id}:${branch_name}`, {
-    //       format: "json",
-    //       lang_iso: "it",
-    //       data: file.base64Content,
-    //       filename: file.fileName,
-    //       replace_modified: true,
-    //       tags: [branch_name],
-    //       cleanup_mode: true, // enables deleted keys to be removed from file
-    //     });
-    //   console.log(file.fileName, res.status);
-    // }
-
-    // // Init class
-    // const lokalise = new Lokalise();
-    // // Create branch
-    // core.info("Creating branch...");
-    // await lokalise.createBranch(branch_name);
-    // core.info("Uploading files...");
-    // // Upload files
-    // await lokalise.upload(branch_name);
-    // // Create task
-    // core.info("Getting target languages...");
-    // const langs = await lokalise.getProjectLanguages();
-    // const targetLangs = langs.items.filter((lang) => lang.lang_iso !== "it");
-    // for (const lang of targetLangs) {
-    //   core.info(`Creating ${lang.lang_iso.toUpperCase()} task...`);
-    //   await lokalise.createTask(branch_name, lang.lang_iso);
-    // }
+    // Init class
+    const lokalise = new Lokalise();
+    // Create branch
+    core.info("Creating branch...");
+    await lokalise.createBranch(branch_name);
+    core.info("Uploading files...");
+    // Upload files
+    await lokalise.upload(branch_name);
+    // Create task
+    core.info("Getting target languages...");
+    const langs = await lokalise.getProjectLanguages();
+    const targetLangs = langs.items.filter((lang) => lang.lang_iso !== "it");
+    for (const lang of targetLangs) {
+      core.info(`Creating ${lang.lang_iso.toUpperCase()} task...`);
+      await lokalise.createTask(branch_name, lang.lang_iso);
+    }
   } catch (err) {
     core.setFailed(err.message);
   }

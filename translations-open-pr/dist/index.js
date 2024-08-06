@@ -58,8 +58,6 @@ exports.Lokalise = void 0;
 var core = __nccwpck_require__(2186);
 var github_1 = __nccwpck_require__(5438);
 var node_api_1 = __nccwpck_require__(8669);
-var fs = __nccwpck_require__(7147);
-var path = __nccwpck_require__(1017);
 //! STEPS:
 // - create branch
 // - upload files
@@ -98,26 +96,37 @@ var Lokalise = /** @class */ (function () {
     };
     Lokalise.prototype.upload = function (branch_name) {
         return __awaiter(this, void 0, void 0, function () {
-            var __root, directoryPath_1, files, base64Files, _i, base64Files_1, file, res, error_1;
+            var folder, base64Files, _i, base64Files_1, file, res, error_1;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 5, , 6]);
-                        __root = path.resolve();
-                        directoryPath_1 = path.join(__root, "locales", "it");
-                        files = fs
-                            .readdirSync(directoryPath_1)
-                            .filter(function (file) { return file.endsWith(".json"); });
-                        base64Files = files.map(function (file) {
-                            var filePath = path.join(directoryPath_1, file);
-                            var fileContent = fs.readFileSync(filePath, "utf-8");
-                            var base64Content = Buffer.from(fileContent).toString("base64");
-                            return { fileName: file, base64Content: base64Content };
-                        });
-                        _i = 0, base64Files_1 = base64Files;
-                        _a.label = 1;
+                        _a.trys.push([0, 7, , 8]);
+                        return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales/it" }))];
                     case 1:
-                        if (!(_i < base64Files_1.length)) return [3 /*break*/, 4];
+                        folder = _a.sent();
+                        return [4 /*yield*/, Promise.all(folder.data
+                                .map(function (f) { return __awaiter(_this, void 0, void 0, function () {
+                                var file, _file;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0: return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path }))];
+                                        case 1:
+                                            file = _a.sent();
+                                            _file = file === null || file === void 0 ? void 0 : file.data;
+                                            if (!(_file === null || _file === void 0 ? void 0 : _file.content))
+                                                return [2 /*return*/, null];
+                                            return [2 /*return*/, { fileName: _file.name, base64Content: _file.content }];
+                                    }
+                                });
+                            }); })
+                                .filter(Boolean))];
+                    case 2:
+                        base64Files = _a.sent();
+                        _i = 0, base64Files_1 = base64Files;
+                        _a.label = 3;
+                    case 3:
+                        if (!(_i < base64Files_1.length)) return [3 /*break*/, 6];
                         file = base64Files_1[_i];
                         return [4 /*yield*/, this.api
                                 .files()
@@ -130,19 +139,19 @@ var Lokalise = /** @class */ (function () {
                                 tags: [branch_name],
                                 cleanup_mode: true, // enables deleted keys to be removed from file
                             })];
-                    case 2:
+                    case 4:
                         res = _a.sent();
-                        console.log(file.fileName, res.status);
-                        _a.label = 3;
-                    case 3:
-                        _i++;
-                        return [3 /*break*/, 1];
-                    case 4: return [3 /*break*/, 6];
+                        console.log("UPLOADED: ", file.fileName, res.status);
+                        _a.label = 5;
                     case 5:
+                        _i++;
+                        return [3 /*break*/, 3];
+                    case 6: return [3 /*break*/, 8];
+                    case 7:
                         error_1 = _a.sent();
                         console.log(error_1);
-                        return [3 /*break*/, 6];
-                    case 6: return [2 /*return*/];
+                        return [3 /*break*/, 8];
+                    case 8: return [2 /*return*/];
                 }
             });
         });
@@ -237,42 +246,48 @@ var Lokalise = /** @class */ (function () {
 exports.Lokalise = Lokalise;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var folder, base64Files, err_1;
-        var _this = this;
+        var lokalise, langs, targetLangs, _i, targetLangs_1, lang, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales/it" }))];
+                    _a.trys.push([0, 8, , 9]);
+                    lokalise = new Lokalise();
+                    // Create branch
+                    core.info("Creating branch...");
+                    return [4 /*yield*/, lokalise.createBranch(branch_name)];
                 case 1:
-                    folder = _a.sent();
-                    return [4 /*yield*/, Promise.all(folder.data
-                            .map(function (f) { return __awaiter(_this, void 0, void 0, function () {
-                            var file, _file;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        console.log("PROCESSING: ", f.name);
-                                        return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path }))];
-                                    case 1:
-                                        file = _a.sent();
-                                        _file = file === null || file === void 0 ? void 0 : file.data;
-                                        if (!(_file === null || _file === void 0 ? void 0 : _file.content))
-                                            return [2 /*return*/, null];
-                                        return [2 /*return*/, { fileName: _file.name, base64Content: _file.content }];
-                                }
-                            });
-                        }); })
-                            .filter(Boolean))];
+                    _a.sent();
+                    core.info("Uploading files...");
+                    // Upload files
+                    return [4 /*yield*/, lokalise.upload(branch_name)];
                 case 2:
-                    base64Files = _a.sent();
-                    console.log(JSON.stringify(base64Files, null, 2));
-                    return [3 /*break*/, 4];
+                    // Upload files
+                    _a.sent();
+                    // Create task
+                    core.info("Getting target languages...");
+                    return [4 /*yield*/, lokalise.getProjectLanguages()];
                 case 3:
+                    langs = _a.sent();
+                    targetLangs = langs.items.filter(function (lang) { return lang.lang_iso !== "it"; });
+                    _i = 0, targetLangs_1 = targetLangs;
+                    _a.label = 4;
+                case 4:
+                    if (!(_i < targetLangs_1.length)) return [3 /*break*/, 7];
+                    lang = targetLangs_1[_i];
+                    core.info("Creating ".concat(lang.lang_iso.toUpperCase(), " task..."));
+                    return [4 /*yield*/, lokalise.createTask(branch_name, lang.lang_iso)];
+                case 5:
+                    _a.sent();
+                    _a.label = 6;
+                case 6:
+                    _i++;
+                    return [3 /*break*/, 4];
+                case 7: return [3 /*break*/, 9];
+                case 8:
                     err_1 = _a.sent();
                     core.setFailed(err_1.message);
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
+                    return [3 /*break*/, 9];
+                case 9: return [2 /*return*/];
             }
         });
     });
