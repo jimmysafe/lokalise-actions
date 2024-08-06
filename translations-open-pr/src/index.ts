@@ -143,6 +143,7 @@ async function run() {
     const base64Files = await Promise.all(
       (folder.data as any)
         .map(async (f: any) => {
+          console.log("PROCESSING: ", JSON.stringify(f, null, 2));
           const file = await octokit.rest.repos.getContent({
             ...request,
             path: f.path,

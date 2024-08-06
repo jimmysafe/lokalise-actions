@@ -251,7 +251,9 @@ function run() {
                             var file;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path }))];
+                                    case 0:
+                                        console.log("PROCESSING: ", JSON.stringify(f, null, 2));
+                                        return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path }))];
                                     case 1:
                                         file = _a.sent();
                                         if (!file)
