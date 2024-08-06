@@ -248,7 +248,7 @@ function run() {
                     folder = _a.sent();
                     return [4 /*yield*/, Promise.all(folder.data
                             .map(function (f) { return __awaiter(_this, void 0, void 0, function () {
-                            var file;
+                            var file, _file;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
@@ -256,11 +256,10 @@ function run() {
                                         return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path }))];
                                     case 1:
                                         file = _a.sent();
-                                        console.log("FILE: ", JSON.stringify(file, null, 2));
-                                        if (!file)
+                                        _file = file === null || file === void 0 ? void 0 : file.data;
+                                        if (!(_file === null || _file === void 0 ? void 0 : _file.content))
                                             return [2 /*return*/, null];
-                                        // @ts-expect-error
-                                        return [2 /*return*/, { fileName: file.name, base64Content: file.content }];
+                                        return [2 /*return*/, { fileName: _file.name, base64Content: _file.content }];
                                 }
                             });
                         }); })

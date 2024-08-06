@@ -148,10 +148,9 @@ async function run() {
             ...request,
             path: f.path,
           });
-          console.log("FILE: ", JSON.stringify(file, null, 2));
-          if (!file) return null;
-          // @ts-expect-error
-          return { fileName: file.name, base64Content: file.content };
+          const _file = file?.data as any;
+          if (!_file?.content) return null;
+          return { fileName: _file.name, base64Content: _file.content };
         })
         .filter(Boolean)
     );
