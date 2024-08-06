@@ -101,19 +101,13 @@ async function run() {
     // Init class
     const lokalise = new Lokalise();
     // Merge and delete branch
-
-    const __root = ".";
-    const __locales = path.join(__root, "locales");
-    const root = fs.readdirSync(__locales);
-    console.log(root);
-
-    // await lokalise.mergeBranch({
-    //   branch_name,
-    //   target_branch_name: "master",
-    //   delete_branch_after_merge: true,
-    // });
+    await lokalise.mergeBranch({
+      branch_name,
+      target_branch_name: "master",
+      delete_branch_after_merge: true,
+    });
     // Download files
-    // await lokalise.download(branch_name);
+    await lokalise.download(branch_name);
   } catch (err) {
     core.setFailed(err.message);
   }
