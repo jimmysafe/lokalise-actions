@@ -141,14 +141,9 @@ async function run() {
   try {
     const res = await octokit.rest.repos.getContent({
       ...request,
-      path: "locales",
+      path: "locales/it",
     });
     console.log(JSON.stringify(res, null, 2));
-    // const directoryPath = path.join(__root, "locales", "it");
-
-    // const files = fs
-    //   .readdirSync(directoryPath)
-    //   .filter((file) => file.endsWith(".json"));
 
     // // Init class
     // const lokalise = new Lokalise();
