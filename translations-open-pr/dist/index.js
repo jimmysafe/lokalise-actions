@@ -237,21 +237,15 @@ var Lokalise = /** @class */ (function () {
 exports.Lokalise = Lokalise;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var res, files, err_1;
+        var res, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales/it", mediaType: {
-                                format: "raw",
-                            } }))];
+                    return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales/it/auth.json" }))];
                 case 1:
                     res = _a.sent();
-                    console.log(JSON.stringify(res, null, 2));
-                    files = fs
-                        .readdirSync("locales/it")
-                        .filter(function (file) { return file.endsWith(".json"); });
-                    console.log("FILES:", files);
+                    console.log(JSON.stringify(res.data, null, 2));
                     return [3 /*break*/, 3];
                 case 2:
                     err_1 = _a.sent();
