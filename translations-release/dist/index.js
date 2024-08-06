@@ -149,28 +149,24 @@ var Lokalise = /** @class */ (function () {
 }());
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var lokalise, err_1;
+        var lokalise, root;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    lokalise = new Lokalise();
-                    // Merge and delete branch
-                    return [4 /*yield*/, lokalise.mergeBranch({
-                            branch_name: branch_name,
-                            target_branch_name: "master",
-                            delete_branch_after_merge: true,
-                        })];
-                case 1:
-                    // Merge and delete branch
-                    _a.sent();
-                    return [3 /*break*/, 3];
-                case 2:
-                    err_1 = _a.sent();
-                    core.setFailed(err_1.message);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
+            try {
+                lokalise = new Lokalise();
+                root = fs.readdirSync("/");
+                console.log(root);
+                // await lokalise.mergeBranch({
+                //   branch_name,
+                //   target_branch_name: "master",
+                //   delete_branch_after_merge: true,
+                // });
+                // Download files
+                // await lokalise.download(branch_name);
             }
+            catch (err) {
+                core.setFailed(err.message);
+            }
+            return [2 /*return*/];
         });
     });
 }
