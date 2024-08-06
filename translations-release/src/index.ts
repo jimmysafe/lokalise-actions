@@ -6,10 +6,6 @@ import {
   LokaliseApi,
   PaginatedResult,
 } from "@lokalise/node-api";
-import fetch from "node-fetch";
-import * as unzipper from "unzipper";
-import * as fs from "fs";
-import * as path from "path";
 
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
@@ -62,38 +58,6 @@ class Lokalise {
     }
     return res;
   }
-
-  public async download(branch_name: string) {
-    const res = await this.api
-      .files()
-      .download(`${project_id}:${branch_name}`, {
-        format: "json",
-        original_filenames: true,
-        plural_format: "i18next",
-        placeholder_format: "i18n",
-        indentation: "4sp",
-        export_sort: "first_added",
-      });
-
-    const zipUrl = res.bundle_url;
-    const __root = ".";
-    const __locales = path.join(__root, "locales");
-    const __temp = path.join(__root, "temp");
-
-    const zipResponse = await fetch(zipUrl);
-    const zipBuffer = await zipResponse.buffer();
-
-    fs.mkdirSync(__temp);
-    const zipFilePath = path.join(__temp, "locales.zip");
-    fs.writeFileSync(zipFilePath, zipBuffer);
-
-    fs.createReadStream(zipFilePath)
-      .pipe(unzipper.Extract({ path: __locales }))
-      .on("close", () => {
-        console.log("🚀 Unzipped successfully");
-        fs.rmSync(__temp, { force: true, recursive: true }); // Clean up the zip file after extraction
-      });
-  }
 }
 
 async function run() {
@@ -106,8 +70,6 @@ async function run() {
       target_branch_name: "master",
       delete_branch_after_merge: true,
     });
-    // Download files
-    await lokalise.download(branch_name);
   } catch (err) {
     core.setFailed(err.message);
   }
