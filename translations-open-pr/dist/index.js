@@ -54,14 +54,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Lokalise = void 0;
 var core = __nccwpck_require__(2186);
 var github_1 = __nccwpck_require__(5438);
 var node_api_1 = __nccwpck_require__(8669);
-//! STEPS:
-// - create branch
-// - upload files
-// - create task
 var myToken = core.getInput("token");
 var octokit = (0, github_1.getOctokit)(myToken);
 var apiKey = core.getInput("lokaliseApiToken");
@@ -246,7 +241,6 @@ var Lokalise = /** @class */ (function () {
     };
     return Lokalise;
 }());
-exports.Lokalise = Lokalise;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var lokalise, langs, targetLangs, _i, targetLangs_1, lang, err_1;

@@ -9,11 +9,6 @@ import {
   UserGroup,
 } from "@lokalise/node-api";
 
-//! STEPS:
-// - create branch
-// - upload files
-// - create task
-
 const myToken = core.getInput("token");
 const octokit = getOctokit(myToken);
 
@@ -27,7 +22,7 @@ const request = {
   ref: context.sha,
 };
 
-export class Lokalise {
+class Lokalise {
   api: LokaliseApi;
   constructor() {
     this.api = new LokaliseApi({
