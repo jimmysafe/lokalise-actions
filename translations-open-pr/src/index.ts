@@ -108,6 +108,10 @@ export class Lokalise {
       project_id: `${project_id}:${branch_name}`,
       filter_tags: branch_name,
     });
+    console.log(
+      "KEYS: ",
+      res.items.map((key) => key.key_id)
+    );
     return res.items.map((key) => key.key_id);
   }
 
@@ -126,22 +130,31 @@ export class Lokalise {
 
 async function run() {
   try {
-    // Init class
-    const lokalise = new Lokalise();
-    // Create branch
-    core.info("Creating branch...");
-    await lokalise.createBranch(branch_name);
-    core.info("Uploading files...");
-    // Upload files
-    await lokalise.upload(branch_name);
-    // Create task
-    core.info("Getting target languages...");
-    const langs = await lokalise.getProjectLanguages();
-    const targetLangs = langs.items.filter((lang) => lang.lang_iso !== "it");
-    for (const lang of targetLangs) {
-      core.info(`Creating ${lang.lang_iso.toUpperCase()} task...`);
-      await lokalise.createTask(branch_name, lang.lang_iso);
-    }
+    core.info("ProjectId: " + project_id);
+    const __root = path.resolve();
+    core.info("Root: " + __root);
+    // const directoryPath = path.join(__root, "locales", "it");
+
+    // const files = fs
+    //   .readdirSync(directoryPath)
+    //   .filter((file) => file.endsWith(".json"));
+
+    // // Init class
+    // const lokalise = new Lokalise();
+    // // Create branch
+    // core.info("Creating branch...");
+    // await lokalise.createBranch(branch_name);
+    // core.info("Uploading files...");
+    // // Upload files
+    // await lokalise.upload(branch_name);
+    // // Create task
+    // core.info("Getting target languages...");
+    // const langs = await lokalise.getProjectLanguages();
+    // const targetLangs = langs.items.filter((lang) => lang.lang_iso !== "it");
+    // for (const lang of targetLangs) {
+    //   core.info(`Creating ${lang.lang_iso.toUpperCase()} task...`);
+    //   await lokalise.createTask(branch_name, lang.lang_iso);
+    // }
   } catch (err) {
     core.setFailed(err.message);
   }

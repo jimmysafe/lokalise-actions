@@ -181,6 +181,7 @@ var Lokalise = /** @class */ (function () {
                         })];
                     case 1:
                         res = _a.sent();
+                        console.log("KEYS: ", res.items.map(function (key) { return key.key_id; }));
                         return [2 /*return*/, res.items.map(function (key) { return key.key_id; })];
                 }
             });
@@ -219,49 +220,37 @@ var Lokalise = /** @class */ (function () {
 exports.Lokalise = Lokalise;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var lokalise, langs, targetLangs, _i, targetLangs_1, lang, err_1;
+        var __root;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 8, , 9]);
-                    lokalise = new Lokalise();
-                    // Create branch
-                    core.info("Creating branch...");
-                    return [4 /*yield*/, lokalise.createBranch(branch_name)];
-                case 1:
-                    _a.sent();
-                    core.info("Uploading files...");
-                    // Upload files
-                    return [4 /*yield*/, lokalise.upload(branch_name)];
-                case 2:
-                    // Upload files
-                    _a.sent();
-                    // Create task
-                    core.info("Getting target languages...");
-                    return [4 /*yield*/, lokalise.getProjectLanguages()];
-                case 3:
-                    langs = _a.sent();
-                    targetLangs = langs.items.filter(function (lang) { return lang.lang_iso !== "it"; });
-                    _i = 0, targetLangs_1 = targetLangs;
-                    _a.label = 4;
-                case 4:
-                    if (!(_i < targetLangs_1.length)) return [3 /*break*/, 7];
-                    lang = targetLangs_1[_i];
-                    core.info("Creating ".concat(lang.lang_iso.toUpperCase(), " task..."));
-                    return [4 /*yield*/, lokalise.createTask(branch_name, lang.lang_iso)];
-                case 5:
-                    _a.sent();
-                    _a.label = 6;
-                case 6:
-                    _i++;
-                    return [3 /*break*/, 4];
-                case 7: return [3 /*break*/, 9];
-                case 8:
-                    err_1 = _a.sent();
-                    core.setFailed(err_1.message);
-                    return [3 /*break*/, 9];
-                case 9: return [2 /*return*/];
+            try {
+                core.info("ProjectId: " + project_id);
+                __root = path.resolve();
+                core.info("Root: " + __root);
+                // const directoryPath = path.join(__root, "locales", "it");
+                // const files = fs
+                //   .readdirSync(directoryPath)
+                //   .filter((file) => file.endsWith(".json"));
+                // // Init class
+                // const lokalise = new Lokalise();
+                // // Create branch
+                // core.info("Creating branch...");
+                // await lokalise.createBranch(branch_name);
+                // core.info("Uploading files...");
+                // // Upload files
+                // await lokalise.upload(branch_name);
+                // // Create task
+                // core.info("Getting target languages...");
+                // const langs = await lokalise.getProjectLanguages();
+                // const targetLangs = langs.items.filter((lang) => lang.lang_iso !== "it");
+                // for (const lang of targetLangs) {
+                //   core.info(`Creating ${lang.lang_iso.toUpperCase()} task...`);
+                //   await lokalise.createTask(branch_name, lang.lang_iso);
+                // }
             }
+            catch (err) {
+                core.setFailed(err.message);
+            }
+            return [2 /*return*/];
         });
     });
 }
