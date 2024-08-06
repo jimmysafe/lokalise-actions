@@ -1,0 +1,5 @@
+name: "Translation Release"
+description: "This will merge and delete the branch after the PR is merged. It will also download the translations files."
+runs:
+  using: "node20"
+  main: "dist/index.js"

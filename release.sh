@@ -1,5 +1,7 @@
 cd translations-open-pr && 
-npm run build && 
+npm run build &&
+cd ../translations-release &&
+npm run build &&
 cd .. && 
 git add . && 
 git commit -m 'build' && 
