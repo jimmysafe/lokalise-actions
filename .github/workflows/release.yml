@@ -11,9 +11,6 @@ on:
       lokaliseProjectId:
         type: string
         required: true
-      token:
-        type: string
-        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -35,10 +32,12 @@ jobs:
 
       - name: Merge and Delete Branch
         uses: ./translations-release
+        env:
+          MY_TOKEN: ${{ secrets.MY_TOKEN }}
         with:
           lokaliseApiToken: ${{ inputs.lokaliseApiToken }}
           lokaliseProjectId: ${{ inputs.lokaliseProjectId }}
-          token: ${{ secrets.MY_TOKEN}}
+          token: ${{ env.MY_TOKEN}}
 
       - name: Install Lokalise CLI
         uses: frenck/action-setup-lokalise@v1

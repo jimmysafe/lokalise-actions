@@ -11,9 +11,6 @@ on:
       lokaliseProjectId:
         type: string
         required: true
-      token:
-        type: string
-        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -54,11 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: lokalise
+        env:
+          MY_TOKEN: ${{ secrets.MY_TOKEN }}
         uses: ./translations-open-pr
         with:
           lokaliseApiToken: ${{ inputs.lokaliseApiToken }}
           lokaliseProjectId: ${{ inputs.lokaliseProjectId }}
-          token: ${{ inputs.token }}
-          # lokaliseApiToken: f65180bcef55eb0fa6bc794421b340dc6dbf0569
-          # lokaliseProjectId: 175820916698d77c9ef940.96307178
-          # token: ${{ secrets.MY_TOKEN}}
+          token: ${{ env.MY_TOKEN }}
