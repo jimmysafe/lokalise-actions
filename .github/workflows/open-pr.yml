@@ -50,14 +50,11 @@ jobs:
     if: ${{needs.check_changed_files.outputs.changed_files != ''}}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
       - name: lokalise
         env:
           MY_TOKEN: ${{ secrets.MY_TOKEN }}
-        uses: ./translations-open-pr
+        uses: ./translations-open-pr/action.yml
         with:
           lokaliseApiToken: ${{ inputs.lokaliseApiToken }}
           lokaliseProjectId: ${{ inputs.lokaliseProjectId }}
