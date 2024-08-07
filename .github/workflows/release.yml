@@ -1,0 +1,58 @@
+name: Release translations
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        type: string
+        default: ubuntu-latest
+      lokaliseApiToken:
+        type: string
+        required: true
+      lokaliseProjectId:
+        type: string
+        required: true
+      token:
+        type: string
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  process_translations:
+    name: Merge Branch and Download Translations
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Merge and Delete Branch
+        uses: ./translations-release
+        with:
+          lokaliseApiToken: ${{ inputs.lokaliseApiToken }}
+          lokaliseProjectId: ${{ inputs.lokaliseProjectId }}
+          token: ${{ secrets.MY_TOKEN}}
+
+      - name: Install Lokalise CLI
+        uses: frenck/action-setup-lokalise@v1
+
+      - name: Download Translations
+        run: |
+          lokalise2 \
+            --token ${{ inputs.lokaliseApiToken }} \
+            --project-id ${{ inputs.lokaliseProjectId }}:master \
+            file download \
+            --format json \
+            --plural-format i18next \
+            --placeholder-format i18n \
+            --export-sort first_added \
+            --indentation 4sp \
+            --triggers github \
+            --unzip-to ./locales
