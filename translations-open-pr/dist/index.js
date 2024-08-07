@@ -136,7 +136,7 @@ var Lokalise = /** @class */ (function () {
                                 filename: file.fileName,
                                 replace_modified: true,
                                 tags: [branch_name],
-                                cleanup_mode: true, // enables deleted keys to be removed from file
+                                // cleanup_mode: true, // enables deleted keys to be removed from file
                             })];
                     case 4:
                         res = _a.sent();

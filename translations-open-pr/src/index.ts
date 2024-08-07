@@ -78,7 +78,7 @@ class Lokalise {
             filename: file.fileName,
             replace_modified: true,
             tags: [branch_name],
-            cleanup_mode: true, // enables deleted keys to be removed from file
+            // cleanup_mode: true, // enables deleted keys to be removed from file
           });
         if (res?.process_id) processes.push(res.process_id);
       }
