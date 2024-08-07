@@ -54,7 +54,7 @@ jobs:
       - name: lokalise
         env:
           MY_TOKEN: ${{ secrets.MY_TOKEN }}
-        uses: ./translations-open-pr
+        uses: jimmysafe/lokalise-actions/translations-open-pr@main-v1
         with:
           lokaliseApiToken: ${{ inputs.lokaliseApiToken }}
           lokaliseProjectId: ${{ inputs.lokaliseProjectId }}
