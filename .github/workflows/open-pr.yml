@@ -50,6 +50,10 @@ jobs:
     if: ${{needs.check_changed_files.outputs.changed_files != ''}}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: lokalise
         env:
           MY_TOKEN: ${{ secrets.MY_TOKEN }}
