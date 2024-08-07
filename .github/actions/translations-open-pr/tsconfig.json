@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "lib": ["ES2015"],
-    "module": "CommonJS",
-    "outDir": "./build"
-  },
-  "exclude": ["node_modules"],
-  "include": ["src"]
-}

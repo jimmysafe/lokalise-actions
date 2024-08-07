@@ -54,7 +54,7 @@ jobs:
       - name: lokalise
         env:
           MY_TOKEN: ${{ secrets.MY_TOKEN }}
-        uses: ./.github/actions/translations-open-pr/action.yml
+        uses: ./translations-open-pr
         with:
           lokaliseApiToken: ${{ inputs.lokaliseApiToken }}
           lokaliseProjectId: ${{ inputs.lokaliseProjectId }}
