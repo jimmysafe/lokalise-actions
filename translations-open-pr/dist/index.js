@@ -178,7 +178,7 @@ var Lokalise = /** @class */ (function () {
                         return [2 /*return*/, this.api.tasks().create({
                                 title: "Update ".concat(lang.toUpperCase(), " - ").concat(branch_name),
                                 keys: keys,
-                                description: branch_name,
+                                description: JSON.stringify(__assign(__assign({}, request), { ref: branch_name })),
                                 languages: [
                                     {
                                         language_iso: lang,

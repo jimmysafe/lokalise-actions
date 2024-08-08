@@ -108,7 +108,7 @@ class Lokalise {
         {
           title: `Update ${lang.toUpperCase()} - ${branch_name}`,
           keys,
-          description: branch_name,
+          description: JSON.stringify({ ...request, ref: branch_name }),
           languages: [
             {
               language_iso: lang,
