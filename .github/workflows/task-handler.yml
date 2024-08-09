@@ -1,0 +1,36 @@
+name: Task Changed Status
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        type: string
+        default: ubuntu-latest
+      task_id:
+        type: string
+        required: true
+
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+
+# permissions:
+#   id-token: write
+#   contents: read
+#   pull-requests: write
+
+jobs:
+  process_translations:
+    name: Create Branch and tasks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: lokalise
+        env:
+          MY_TOKEN: ${{ secrets.MY_TOKEN }}
+          LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
+          LOKALISE_PROJECT_ID: ${{ secrets.LOKALISE_PROJECT_ID }}
+        uses: jimmysafe/lokalise-actions/translations-task-handler@main-v1
+        with:
+          lokaliseApiToken: ${{ env.LOKALISE_API_TOKEN }}
+          lokaliseProjectId: ${{ env.LOKALISE_PROJECT_ID }}
+          token: ${{ env.MY_TOKEN }}
+          task_id: ${{ inputs.task_id }}

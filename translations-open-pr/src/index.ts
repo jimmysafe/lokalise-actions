@@ -78,7 +78,7 @@ class Lokalise {
             filename: file.fileName,
             replace_modified: true,
             tags: [branch_name],
-            // cleanup_mode: true, // enables deleted keys to be removed from file
+            // cleanup_mode: true, // !enables deleted keys to be removed from file
           });
         if (res?.process_id) processes.push(res.process_id);
       }
@@ -108,7 +108,13 @@ class Lokalise {
         {
           title: `Update ${lang.toUpperCase()} - ${branch_name}`,
           keys,
-          description: JSON.stringify({ ...request, ref: branch_name }),
+          // !IMPORTANT: Data to be used in the webhook
+          description: JSON.stringify({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pr_number: context.payload.pull_request.number,
+            ref: branch_name,
+          }),
           languages: [
             {
               language_iso: lang,
