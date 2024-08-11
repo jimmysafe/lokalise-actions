@@ -25,8 +25,10 @@ function formatTaskStatus(status: string) {
   switch (status) {
     case "created":
       return "🛠️ In Progress";
-    case "closed":
+    case "completed":
       return "✅ Completed";
+    case "closed":
+      return "❌ Closed";
     default:
       return status;
   }
