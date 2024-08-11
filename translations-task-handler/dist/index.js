@@ -28,8 +28,18 @@ const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
 const request = JSON.parse(gh_data);
 const branch_name = request.ref;
+function formatTaskStatus(status) {
+    switch (status) {
+        case "created":
+            return "🛠️ In Progress";
+        case "closed":
+            return "✅ Completed";
+        default:
+            return "...";
+    }
+}
 function getCommentTableRow(task) {
-    return `| ${task.title} | ${task.status} | ([Visit](https://app.lokalise.com/project/${project_id}/?view=multi&filter=task_${task.task_id}&branch=${branch_name !== null && branch_name !== void 0 ? branch_name : "master"}) |`;
+    return `| ${task.title} | ${formatTaskStatus(task.status)} | [Visit](https://app.lokalise.com/project/${project_id}/?view=multi&filter=task_${task.task_id}&branch=${branch_name !== null && branch_name !== void 0 ? branch_name : "master"}) |`;
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -81,7 +91,7 @@ function run() {
                     if (task)
                         tableLines.push(getCommentTableRow(task));
                 }
-                yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, request), { comment_id: comment.id, body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${newIds.join(", ")}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${tableLines.join("<br />")}` }));
+                yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, request), { comment_id: comment.id, body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${newIds.join(", ")}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${tableLines.join("\n")}` }));
             }
         }
         catch (err) {

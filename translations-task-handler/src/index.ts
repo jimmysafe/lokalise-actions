@@ -21,10 +21,21 @@ const request = JSON.parse(gh_data) as {
 
 const branch_name = request.ref;
 
+function formatTaskStatus(status: string) {
+  switch (status) {
+    case "created":
+      return "🛠️ In Progress";
+    case "closed":
+      return "✅ Completed";
+    default:
+      return "...";
+  }
+}
+
 function getCommentTableRow(task: Task) {
-  return `| ${task.title} | ${
+  return `| ${task.title} | ${formatTaskStatus(
     task.status
-  } | ([Visit](https://app.lokalise.com/project/${project_id}/?view=multi&filter=task_${
+  )} | [Visit](https://app.lokalise.com/project/${project_id}/?view=multi&filter=task_${
     task.task_id
   }&branch=${branch_name ?? "master"}) |`;
 }
@@ -89,7 +100,7 @@ async function run() {
         body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${newIds.join(
           ", "
         )}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${tableLines.join(
-          "<br />"
+          "\n"
         )}`,
       });
     }
