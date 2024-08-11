@@ -59,7 +59,8 @@ async function run() {
         issue_number: request.pull_number,
         owner: request.owner,
         repo: request.repo,
-        body: "First Header | Second Header\n------------ | -------------\nContent from cell 1 | Content from cell 2\nContent in the first column | Content in the second column",
+        // body: "First Header | Second Header\n------------ | -------------\nContent from cell 1 | Content from cell 2\nContent in the first column | Content in the second column",
+        body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${task_id}]% -->\nciaooo`,
         // body: `
         //   <!-- LOKALISE_TASKS --> <br />
         //   <!-- taskIds: %[${task_id}]% --> <br />
