@@ -47,7 +47,7 @@ export default async function POST(req: VercelRequest, res: VercelResponse) {
       committedFiles[`locales/${file.path}`] = content.toString();
     }
 
-    await octokit.createPullRequest({
+    const create_response = await octokit.createPullRequest({
       owner: "jimmysafe",
       repo: "lokalise-poc",
       title: `Lokalise update - ${new Date().getTime()}`,
@@ -66,6 +66,8 @@ export default async function POST(req: VercelRequest, res: VercelResponse) {
         },
       ],
     });
+
+    return res.json({ status: create_response.status });
   } catch (err: any) {
     console.error(err);
     return res
