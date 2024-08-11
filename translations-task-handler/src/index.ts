@@ -28,7 +28,7 @@ function formatTaskStatus(status: string) {
     case "closed":
       return "✅ Completed";
     default:
-      return "...";
+      return status;
   }
 }
 
@@ -84,10 +84,11 @@ async function run() {
       }
 
       const ids = JSON.parse(match[1]);
-      const newIds = [...new Set([...ids, task_id])];
-      console.log("NEW TASK IDS: ", newIds);
+      const newIds = [...ids, task_id].filter(Boolean).map((n) => Number(n));
+      const uniqueIds = [...new Set(newIds)];
+      console.log("NEW TASK IDS: ", uniqueIds);
       const tableLines: string[] = [];
-      for (const id of newIds) {
+      for (const id of uniqueIds) {
         const task = await api
           .tasks()
           .get(id, { project_id: `${project_id}:${branch_name}` });
@@ -97,7 +98,7 @@ async function run() {
       await octokit.rest.issues.updateComment({
         ...request,
         comment_id: comment.id,
-        body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${newIds.join(
+        body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${uniqueIds.join(
           ", "
         )}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${tableLines.join(
           "\n"

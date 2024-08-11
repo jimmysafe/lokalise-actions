@@ -35,7 +35,7 @@ function formatTaskStatus(status) {
         case "closed":
             return "✅ Completed";
         default:
-            return "...";
+            return status;
     }
 }
 function getCommentTableRow(task) {
@@ -81,17 +81,18 @@ function run() {
                     return;
                 }
                 const ids = JSON.parse(match[1]);
-                const newIds = [...new Set([...ids, task_id])];
-                console.log("NEW TASK IDS: ", newIds);
+                const newIds = [...ids, task_id].filter(Boolean).map((n) => Number(n));
+                const uniqueIds = [...new Set(newIds)];
+                console.log("NEW TASK IDS: ", uniqueIds);
                 const tableLines = [];
-                for (const id of newIds) {
+                for (const id of uniqueIds) {
                     const task = yield api
                         .tasks()
                         .get(id, { project_id: `${project_id}:${branch_name}` });
                     if (task)
                         tableLines.push(getCommentTableRow(task));
                 }
-                yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, request), { comment_id: comment.id, body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${newIds.join(", ")}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${tableLines.join("\n")}` }));
+                yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, request), { comment_id: comment.id, body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${uniqueIds.join(", ")}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${tableLines.join("\n")}` }));
             }
         }
         catch (err) {
