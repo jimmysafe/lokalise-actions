@@ -31197,7 +31197,7 @@ class LokalisePkg {
     static async getVersion() {
         let pkg;
         try {
-            pkg = JSON.parse((await (0,promises_namespaceObject.readFile)(new URL(LokalisePkg.pkgPath(), "file:///Users/basilico/projects/lokalise-actions/translations-task-handler/node_modules/@lokalise/node-api/dist/lokalise/pkg.js"))).toString());
+            pkg = JSON.parse((await (0,promises_namespaceObject.readFile)(new URL(LokalisePkg.pkgPath(), "file:///Users/basilico/projects/lokalise-actions/translations-task-status-comments/node_modules/@lokalise/node-api/dist/lokalise/pkg.js"))).toString());
         }
         catch (_e) {
             pkg = null;

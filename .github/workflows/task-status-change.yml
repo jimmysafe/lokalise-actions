@@ -1,4 +1,4 @@
-name: Task Changed Status
+name: Task Status Change
 on:
   workflow_call:
     inputs:
@@ -21,8 +21,8 @@ on:
 #   pull-requests: write
 
 jobs:
-  process_translations:
-    name: Create Branch and tasks
+  task_status_change:
+    name: Task Status Change
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
           LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
           LOKALISE_PROJECT_ID: ${{ secrets.LOKALISE_PROJECT_ID }}
-        uses: jimmysafe/lokalise-actions/translations-task-handler@main-v1
+        uses: jimmysafe/lokalise-actions/translations-task-status-comments@main-v1
         with:
           lokaliseApiToken: ${{ env.LOKALISE_API_TOKEN }}
           lokaliseProjectId: ${{ env.LOKALISE_PROJECT_ID }}

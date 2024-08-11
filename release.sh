@@ -2,7 +2,7 @@ cd translations-open-pr &&
 npm run build &&
 cd ../translations-release &&
 npm run build &&
-cd ../translations-task-handler &&
+cd ../translations-task-status-comments &&
 npm run build &&
 cd .. && 
 git add . && 
