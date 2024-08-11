@@ -59,15 +59,7 @@ function run() {
                     issue_number: request.pull_number,
                     owner: request.owner,
                     repo: request.repo,
-                    // body: "First Header | Second Header\n------------ | -------------\nContent from cell 1 | Content from cell 2\nContent in the first column | Content in the second column",
-                    body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${task_id}]% -->\nciaooo`,
-                    // body: `
-                    //   <!-- LOKALISE_TASKS --> <br />
-                    //   <!-- taskIds: %[${task_id}]% --> <br />
-                    //   | Name | Status | Preview
-                    //   | :--- | :----- | :------ |
-                    //   ${getCommentTableRow(task)}
-                    // `,
+                    body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${task_id}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${getCommentTableRow(task)}`,
                 });
             }
             else {
@@ -89,14 +81,7 @@ function run() {
                     if (task)
                         tableLines.push(getCommentTableRow(task));
                 }
-                yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, request), { comment_id: comment.id, body: `
-          <!-- LOKALISE_TASKS --> <br />
-          <!-- taskIds: %[${newIds.join(", ")}]% --> <br />
-
-          | Name | Status | Preview
-          | :--- | :----- | :------ |
-          ${tableLines.join("<br />")}
-        ` }));
+                yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, request), { comment_id: comment.id, body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${newIds.join(", ")}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${tableLines.join("<br />")}` }));
             }
         }
         catch (err) {
