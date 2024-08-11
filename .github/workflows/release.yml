@@ -9,10 +9,10 @@ on:
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.ref }}
 
-permissions:
-  id-token: write
-  contents: read
-  pull-requests: write
+# permissions:
+#   id-token: write
+#   contents: read
+#   pull-requests: write
 
 jobs:
   process_translations:
@@ -24,16 +24,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Generate a token
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.TRANSLATIONS_BOT_APP_ID }}
+          private_key: ${{ secrets.TRANSLATIONS_BOT_PRIVATE_KEY }}
+
       - name: Merge and Delete Branch
         uses: jimmysafe/lokalise-actions/translations-release@main-v1
         env:
-          MY_TOKEN: ${{ secrets.MY_TOKEN }}
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
           LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
           LOKALISE_PROJECT_ID: ${{ secrets.LOKALISE_PROJECT_ID }}
         with:
           lokaliseApiToken: ${{ env.LOKALISE_API_TOKEN }}
           lokaliseProjectId: ${{ env.LOKALISE_PROJECT_ID }}
-          token: ${{ env.MY_TOKEN }}
+          token: ${{ env.GH_TOKEN }}
 
       - name: Install Lokalise CLI
         uses: frenck/action-setup-lokalise@v1
