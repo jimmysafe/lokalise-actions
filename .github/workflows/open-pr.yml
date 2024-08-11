@@ -17,6 +17,7 @@ on:
 jobs:
   check_changed_files:
     name: Check changed files
+    if: !contains(github.event.pull_request.labels.*.name , 'translations-check-ignore')
     runs-on: ${{ inputs.runs-on }}
     outputs:
       changed_files: ${{ steps.changed-files.outputs.locales_all_modified_files }}

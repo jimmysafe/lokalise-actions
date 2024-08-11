@@ -127,6 +127,7 @@ function run() {
                 case 8: return [4 /*yield*/, octokit.createPullRequest(__assign(__assign({}, request), { title: "Lokalise update - ".concat(new Date().getTime()), body: "pull request description", head: "lokalise-".concat(new Date().getTime()), update: false /* optional: set to `true` to enable updating existing pull requests */, labels: [
                             "automerge",
                             "build-ignore",
+                            "translations-check-ignore",
                         ] /* optional: applies the given labels when user has permissions. When updating an existing pull request, already present labels will not be deleted. */, changes: [
                             {
                                 files: committedFiles,
