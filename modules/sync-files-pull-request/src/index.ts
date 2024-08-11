@@ -40,7 +40,7 @@ async function run() {
       });
 
     const zipUrl = response.bundle_url;
-    const _temp = path.join(path.resolve(), "temp");
+    const _temp = path.join(path.resolve(), `temp-${new Date().getTime()}`);
 
     // const zipResponse = await fetch(zipUrl);
     // const zipBuffer = await zipResponse.buffer();

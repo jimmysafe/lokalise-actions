@@ -95,7 +95,7 @@ function run() {
                 case 1:
                     response = _a.sent();
                     zipUrl = response.bundle_url;
-                    _temp = path.join(path.resolve(), "temp");
+                    _temp = path.join(path.resolve(), "temp-".concat(new Date().getTime()));
                     return [4 /*yield*/, (0, node_fetch_1.default)(zipUrl)];
                 case 2:
                     zipResponse = _a.sent();
