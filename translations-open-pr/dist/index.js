@@ -182,7 +182,7 @@ var Lokalise = /** @class */ (function () {
                                 description: JSON.stringify({
                                     owner: github_1.context.repo.owner,
                                     repo: github_1.context.repo.repo,
-                                    pr_number: github_1.context.payload.pull_request.number,
+                                    pull_number: github_1.context.payload.pull_request.number,
                                     ref: branch_name,
                                 }),
                                 languages: [

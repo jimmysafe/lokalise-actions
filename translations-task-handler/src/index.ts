@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { getOctokit, context } from "@actions/github";
+import { getOctokit } from "@actions/github";
 import { LokaliseApi, Task } from "@lokalise/node-api";
 
 //  lokalise webhook task (created/deleted ecc..) -> Vercel Function -> task-opened/task-closed (based on payload) -> calls this file
@@ -8,16 +8,18 @@ const myToken = core.getInput("token");
 const octokit = getOctokit(myToken);
 
 const task_id = core.getInput("task_id");
+const gh_data = core.getInput("gh_data");
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
-const branch_name = context.payload.pull_request?.head?.ref ?? "feat/new-wh";
-const pull_number = context.payload.pull_request.number ?? 36;
 
-const request = {
-  owner: context.repo.owner,
-  repo: context.repo.repo,
-  issue_number: pull_number,
+const request = JSON.parse(gh_data) as {
+  owner: string;
+  repo: string;
+  pull_number: number;
+  ref: string;
 };
+
+const branch_name = request.ref;
 
 function getCommentTableRow(task: Task) {
   return `| ${task.title} | ${
@@ -43,7 +45,9 @@ async function run() {
     }
     console.log("[RETRIEVING PR COMMENTS]");
     const comments = await octokit.rest.issues.listComments({
-      ...request,
+      issue_number: request.pull_number,
+      owner: request.owner,
+      repo: request.repo,
     });
     console.log("[CHECKING COMMENT ALREADY EXISTS]");
     const comment = comments.data.find((c) =>
@@ -52,7 +56,9 @@ async function run() {
     if (!comment) {
       console.log("[COMMENT NOT FOUND: Creating it..]");
       await octokit.rest.issues.createComment({
-        ...request,
+        issue_number: request.pull_number,
+        owner: request.owner,
+        repo: request.repo,
         body: `
           <!-- LOKALISE_TASKS --> <br />
           <!-- taskIds: %[${task_id}]% --> <br />

@@ -15,7 +15,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
 const github_1 = __nccwpck_require__(5438);
@@ -24,15 +23,11 @@ const node_api_1 = __nccwpck_require__(8669);
 const myToken = core.getInput("token");
 const octokit = (0, github_1.getOctokit)(myToken);
 const task_id = core.getInput("task_id");
+const gh_data = core.getInput("gh_data");
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
-const branch_name = (_c = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head) === null || _b === void 0 ? void 0 : _b.ref) !== null && _c !== void 0 ? _c : "feat/new-wh";
-const pull_number = (_d = github_1.context.payload.pull_request.number) !== null && _d !== void 0 ? _d : 36;
-const request = {
-    owner: github_1.context.repo.owner,
-    repo: github_1.context.repo.repo,
-    issue_number: pull_number,
-};
+const request = JSON.parse(gh_data);
+const branch_name = request.ref;
 function getCommentTableRow(task) {
     return `| ${task.title} | ${task.status} | ([Visit](https://app.lokalise.com/project/${project_id}/?view=multi&filter=task_${task.task_id}&branch=${branch_name !== null && branch_name !== void 0 ? branch_name : "master"}) |`;
 }
@@ -51,19 +46,28 @@ function run() {
                 return;
             }
             console.log("[RETRIEVING PR COMMENTS]");
-            const comments = yield octokit.rest.issues.listComments(Object.assign({}, request));
+            const comments = yield octokit.rest.issues.listComments({
+                issue_number: request.pull_number,
+                owner: request.owner,
+                repo: request.repo,
+            });
             console.log("[CHECKING COMMENT ALREADY EXISTS]");
             const comment = comments.data.find((c) => c.body.includes("<!-- LOKALISE_TASKS -->"));
             if (!comment) {
                 console.log("[COMMENT NOT FOUND: Creating it..]");
-                yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, request), { body: `
+                yield octokit.rest.issues.createComment({
+                    issue_number: request.pull_number,
+                    owner: request.owner,
+                    repo: request.repo,
+                    body: `
           <!-- LOKALISE_TASKS --> <br />
           <!-- taskIds: %[${task_id}]% --> <br />
 
           | Name | Status | Preview
           | :--- | :----- | :------ |
           ${getCommentTableRow(task)}
-        ` }));
+        `,
+                });
             }
             else {
                 console.log("[COMMENT ALREADY EXISTS: Updating it..]");

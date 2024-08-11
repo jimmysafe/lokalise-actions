@@ -8,6 +8,9 @@ on:
       task_id:
         type: string
         required: true
+      gh_data:
+        type: string
+        required: true
 
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.ref }}
@@ -41,4 +44,5 @@ jobs:
           lokaliseApiToken: ${{ env.LOKALISE_API_TOKEN }}
           lokaliseProjectId: ${{ env.LOKALISE_PROJECT_ID }}
           token: ${{ env.GH_TOKEN }}
+          gh_data: ${{ inputs.gh_data }}
           task_id: ${{ inputs.task_id }}

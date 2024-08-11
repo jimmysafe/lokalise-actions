@@ -112,7 +112,7 @@ class Lokalise {
           description: JSON.stringify({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            pr_number: context.payload.pull_request.number,
+            pull_number: context.payload.pull_request.number,
             ref: branch_name,
           }),
           languages: [
