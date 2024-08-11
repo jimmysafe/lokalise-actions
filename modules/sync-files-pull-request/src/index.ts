@@ -3,7 +3,10 @@ import { context } from "@actions/github";
 import { Open } from "unzipper";
 import { LokaliseApi } from "@lokalise/node-api";
 import { createPullRequest } from "octokit-plugin-create-pull-request";
-const got = require("got");
+import fetch from "node-fetch";
+import * as fs from "fs";
+import * as path from "path";
+
 const { Octokit } = require("@octokit/rest");
 
 const token = core.getInput("token");
@@ -13,13 +16,6 @@ const project_id = core.getInput("lokaliseProjectId");
 const request = {
   owner: context.repo.owner,
   repo: context.repo.repo,
-};
-
-const zipRequestProxy = (options: any) => {
-  const { url, headers } = options;
-  const stream = got.stream(url, { headers });
-  var proxy = Object.assign(stream, { abort: stream.destroy });
-  return proxy;
 };
 
 async function run() {
@@ -43,10 +39,20 @@ async function run() {
         placeholder_format: "i18n",
       });
 
-    const directory = await Open.url(
-      zipRequestProxy as any,
-      response.bundle_url
-    );
+    const zipUrl = response.bundle_url;
+    const _temp = path.join(path.resolve(), "temp");
+
+    // const zipResponse = await fetch(zipUrl);
+    // const zipBuffer = await zipResponse.buffer();
+    const zipResponse = await fetch(zipUrl);
+    const arrayBuffer = await zipResponse.arrayBuffer();
+    const zipBuffer = Buffer.from(arrayBuffer);
+
+    fs.mkdirSync(_temp);
+    const zipFilePath = path.join(_temp, "locales.zip");
+    fs.writeFileSync(zipFilePath, zipBuffer);
+
+    const directory = await Open.file(zipFilePath);
 
     const committedFiles = {};
     const files = directory.files.filter((f) => f.type === "File");

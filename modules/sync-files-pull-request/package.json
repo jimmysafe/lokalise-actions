@@ -15,12 +15,13 @@
     "@lokalise/node-api": "^12.7.0",
     "@octokit/rest": "^21.0.1",
     "got": "^14.4.2",
+    "node-fetch": "^3.3.2",
     "octokit-plugin-create-pull-request": "^6.0.0",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.25",
-    "typescript": "^5.4.2",
-    "@vercel/ncc": "^0.34.0"
+    "@vercel/ncc": "^0.34.0",
+    "typescript": "^5.4.2"
   }
 }
