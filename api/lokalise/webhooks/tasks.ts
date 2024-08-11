@@ -62,7 +62,7 @@ export default async function POST(req: VercelRequest, res: VercelResponse) {
       workflow_id: "task-changed.yml",
       ref: gh_data.ref,
       inputs: {
-        task_id: payload.task.id,
+        task_id: payload.task.id.toString(),
         gh_data: payload.task.description, // stringified gh_data
       },
     });
