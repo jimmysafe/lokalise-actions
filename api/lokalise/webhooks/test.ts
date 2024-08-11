@@ -8,6 +8,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
  */
 export default async function POST(req: VercelRequest, res: VercelResponse) {
   try {
+    console.log(JSON.stringify(req.body));
     return res.status(200).json({ body: req.body });
   } catch (err: any) {
     console.error(err);
