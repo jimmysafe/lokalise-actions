@@ -17,7 +17,6 @@ on:
 jobs:
   process_translations:
     name: Merge Branch and Download Translations
-    if: !contains(github.event.pull_request.labels.*.name , 'translations-check-ignore')
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: Checkout source code
