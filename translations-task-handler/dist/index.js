@@ -15,7 +15,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
 const github_1 = __nccwpck_require__(5438);
@@ -27,10 +27,11 @@ const task_id = core.getInput("task_id");
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
 const branch_name = (_c = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head) === null || _b === void 0 ? void 0 : _b.ref) !== null && _c !== void 0 ? _c : "feat/new-wh";
+const pull_number = (_d = github_1.context.payload.pull_request.number) !== null && _d !== void 0 ? _d : 36;
 const request = {
     owner: github_1.context.repo.owner,
     repo: github_1.context.repo.repo,
-    issue_number: github_1.context.payload.pull_request.number,
+    issue_number: pull_number,
 };
 function getCommentTableRow(task) {
     return `| ${task.title} | ${task.status} | ([Visit](https://app.lokalise.com/project/${project_id}/?view=multi&filter=task_${task.task_id}&branch=${branch_name !== null && branch_name !== void 0 ? branch_name : "master"}) |`;

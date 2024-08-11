@@ -11,11 +11,12 @@ const task_id = core.getInput("task_id");
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
 const branch_name = context.payload.pull_request?.head?.ref ?? "feat/new-wh";
+const pull_number = context.payload.pull_request.number ?? 36;
 
 const request = {
   owner: context.repo.owner,
   repo: context.repo.repo,
-  issue_number: context.payload.pull_request.number,
+  issue_number: pull_number,
 };
 
 function getCommentTableRow(task: Task) {
