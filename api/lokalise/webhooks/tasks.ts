@@ -39,6 +39,9 @@ export type LokaliseTaskResponse = {
 export default async function POST(req: VercelRequest, res: VercelResponse) {
   try {
     const payload = req.body as LokaliseTaskResponse;
+    if (!payload.task?.description)
+      return res.status(400).json({ error: "Bad request. Empty GH Data" });
+
     const gh_data = JSON.parse(
       payload.task.description
     ) as ParsedTaskDescription;
