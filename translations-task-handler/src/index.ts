@@ -59,14 +59,15 @@ async function run() {
         issue_number: request.pull_number,
         owner: request.owner,
         repo: request.repo,
-        body: `
-          <!-- LOKALISE_TASKS --> <br />
-          <!-- taskIds: %[${task_id}]% --> <br />
+        body: "First Header | Second Header\n------------ | -------------\nContent from cell 1 | Content from cell 2\nContent in the first column | Content in the second column",
+        // body: `
+        //   <!-- LOKALISE_TASKS --> <br />
+        //   <!-- taskIds: %[${task_id}]% --> <br />
 
-          | Name | Status | Preview
-          | :--- | :----- | :------ |
-          ${getCommentTableRow(task)}
-        `,
+        //   | Name | Status | Preview
+        //   | :--- | :----- | :------ |
+        //   ${getCommentTableRow(task)}
+        // `,
       });
     } else {
       console.log("[COMMENT ALREADY EXISTS: Updating it..]");
