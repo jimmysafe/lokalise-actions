@@ -15,6 +15,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
 const github_1 = __nccwpck_require__(5438);
@@ -25,7 +26,7 @@ const octokit = (0, github_1.getOctokit)(myToken);
 const task_id = core.getInput("task_id");
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
-const branch_name = github_1.context.payload.pull_request.head.ref;
+const branch_name = (_c = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head) === null || _b === void 0 ? void 0 : _b.ref) !== null && _c !== void 0 ? _c : "feat/new-wh";
 const request = {
     owner: github_1.context.repo.owner,
     repo: github_1.context.repo.repo,

@@ -10,7 +10,7 @@ const octokit = getOctokit(myToken);
 const task_id = core.getInput("task_id");
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
-const branch_name = context.payload.pull_request.head.ref;
+const branch_name = context.payload.pull_request?.head?.ref ?? "feat/new-wh";
 
 const request = {
   owner: context.repo.owner,
