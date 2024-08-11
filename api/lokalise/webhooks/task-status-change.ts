@@ -59,7 +59,7 @@ export default async function POST(req: VercelRequest, res: VercelResponse) {
     const githubResponse = await octokit.actions.createWorkflowDispatch({
       owner: gh_data.owner,
       repo: gh_data.repo,
-      workflow_id: "task-changed.yml",
+      workflow_id: "task-status-change.yml",
       ref: gh_data.ref,
       inputs: {
         task_id: payload.task.id.toString(),

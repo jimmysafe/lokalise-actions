@@ -1,33 +1,42 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import got from "got";
-import { Octokit } from "@octokit/rest";
+import * as core from "@actions/core";
+import { context } from "@actions/github";
+import { Open } from "unzipper";
 import { LokaliseApi } from "@lokalise/node-api";
 import { createPullRequest } from "octokit-plugin-create-pull-request";
-import { Open } from "unzipper";
+const got = require("got");
+const { Octokit } = require("@octokit/rest");
 
-const zipRequestProxy = (options) => {
+const token = core.getInput("token");
+const apiKey = core.getInput("lokaliseApiToken");
+const project_id = core.getInput("lokaliseProjectId");
+
+const request = {
+  owner: context.repo.owner,
+  repo: context.repo.repo,
+};
+
+const zipRequestProxy = (options: any) => {
   const { url, headers } = options;
   const stream = got.stream(url, { headers });
   var proxy = Object.assign(stream, { abort: stream.destroy });
   return proxy;
 };
 
-export default async function POST(req: VercelRequest, res: VercelResponse) {
+async function run() {
   try {
-    const MyOctokit = Octokit.plugin(createPullRequest);
-
-    const token = req.headers.gh_token;
+    const MyOctokit = Octokit.plugin(createPullRequest as any);
 
     const octokit = new MyOctokit({
       auth: token,
     });
+
     const lokaliseApi = new LokaliseApi({
-      apiKey: "f65180bcef55eb0fa6bc794421b340dc6dbf0569",
+      apiKey,
     });
 
     const response = await lokaliseApi
       .files()
-      .download(`175820916698d77c9ef940.96307178:master`, {
+      .download(`${project_id}:master`, {
         format: "json",
         original_filenames: true,
         plural_format: "i18next",
@@ -39,7 +48,6 @@ export default async function POST(req: VercelRequest, res: VercelResponse) {
       response.bundle_url
     );
 
-    console.log("Unzipping locales directory");
     const committedFiles = {};
     const files = directory.files.filter((f) => f.type === "File");
     for (const file of files) {
@@ -48,8 +56,7 @@ export default async function POST(req: VercelRequest, res: VercelResponse) {
     }
 
     const create_response = await octokit.createPullRequest({
-      owner: "jimmysafe",
-      repo: "lokalise-poc",
+      ...request,
       title: `Lokalise update - ${new Date().getTime()}`,
       body: "pull request description",
       head: `lokalise-${new Date().getTime()}`,
@@ -67,11 +74,10 @@ export default async function POST(req: VercelRequest, res: VercelResponse) {
       ],
     });
 
-    return res.json({ status: create_response.status });
-  } catch (err: any) {
-    console.error(err);
-    return res
-      .status(400)
-      .json({ error: err?.message ?? "Something went wrong" });
+    console.log(JSON.stringify({ status: create_response.status }));
+  } catch (err) {
+    core.setFailed(err.message);
   }
 }
+
+run();

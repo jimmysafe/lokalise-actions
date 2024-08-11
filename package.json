@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "@lokalise/node-api": "^12.7.0",
-    "@octokit/core": "^6.1.2",
     "@octokit/rest": "^21.0.1",
     "got": "^14.4.2",
     "octokit-plugin-create-pull-request": "^6.0.0",

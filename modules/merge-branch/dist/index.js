@@ -6,17 +6,6 @@
 
 "use strict";
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -57,206 +46,56 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 var core = __nccwpck_require__(2186);
 var github_1 = __nccwpck_require__(5438);
 var node_api_1 = __nccwpck_require__(8669);
-var myToken = core.getInput("token");
-var octokit = (0, github_1.getOctokit)(myToken);
 var apiKey = core.getInput("lokaliseApiToken");
 var project_id = core.getInput("lokaliseProjectId");
 var branch_name = github_1.context.payload.pull_request.head.ref;
-var request = {
-    owner: github_1.context.repo.owner,
-    repo: github_1.context.repo.repo,
-    ref: github_1.context.sha,
-};
 var Lokalise = /** @class */ (function () {
     function Lokalise() {
         this.api = new node_api_1.LokaliseApi({
             apiKey: apiKey,
         });
     }
-    Lokalise.prototype.createBranch = function (branch_name) {
+    Lokalise.prototype.getProjectBranches = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var branches, existing;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.api.branches().list({ project_id: project_id })];
-                    case 1:
-                        branches = _a.sent();
-                        existing = branches.items.find(function (b) { return b.name === branch_name; });
-                        if (existing)
-                            return [2 /*return*/, existing];
-                        return [2 /*return*/, this.api.branches().create({ name: branch_name }, { project_id: project_id })];
-                }
+                return [2 /*return*/, this.api.branches().list({ project_id: project_id })];
             });
         });
     };
-    Lokalise.prototype.upload = function (branch_name) {
+    Lokalise.prototype.deleteBranch = function (branch_id) {
         return __awaiter(this, void 0, void 0, function () {
-            var folder, base64Files, processes, _i, base64Files_1, file, res, error_1;
-            var _this = this;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 7, , 8]);
-                        return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: "locales/it" }))];
+                return [2 /*return*/, this.api.branches().delete(branch_id, { project_id: project_id })];
+            });
+        });
+    };
+    Lokalise.prototype.mergeBranch = function (_a) {
+        return __awaiter(this, arguments, void 0, function (_b) {
+            var branches, sourceBrance, targetBranch, res;
+            var branch_name = _b.branch_name, target_branch_name = _b.target_branch_name, _c = _b.delete_branch_after_merge, delete_branch_after_merge = _c === void 0 ? false : _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0: return [4 /*yield*/, this.getProjectBranches()];
                     case 1:
-                        folder = _a.sent();
-                        return [4 /*yield*/, Promise.all(folder.data
-                                .map(function (f) { return __awaiter(_this, void 0, void 0, function () {
-                                var file, base64Content;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0: return [4 /*yield*/, octokit.rest.repos.getContent(__assign(__assign({}, request), { path: f.path, mediaType: {
-                                                    format: "raw",
-                                                } }))];
-                                        case 1:
-                                            file = _a.sent();
-                                            base64Content = Buffer.from(file.data.toString()).toString("base64");
-                                            return [2 /*return*/, {
-                                                    fileName: f.name,
-                                                    base64Content: base64Content,
-                                                }];
-                                    }
-                                });
-                            }); })
-                                .filter(Boolean))];
-                    case 2:
-                        base64Files = _a.sent();
-                        processes = [];
-                        _i = 0, base64Files_1 = base64Files;
-                        _a.label = 3;
-                    case 3:
-                        if (!(_i < base64Files_1.length)) return [3 /*break*/, 6];
-                        file = base64Files_1[_i];
-                        return [4 /*yield*/, this.api
-                                .files()
-                                .upload("".concat(project_id, ":").concat(branch_name), {
-                                format: "json",
-                                lang_iso: "it",
-                                data: file.base64Content,
-                                filename: file.fileName,
-                                replace_modified: true,
-                                tags: [branch_name],
-                                // cleanup_mode: true, // !enables deleted keys to be removed from file
+                        branches = _d.sent();
+                        sourceBrance = branches.items.find(function (b) { return b.name === branch_name; });
+                        targetBranch = branches.items.find(function (b) { return b.name === target_branch_name; });
+                        if (!sourceBrance)
+                            throw new Error("Branch ".concat(branch_name, " not found"));
+                        if (!targetBranch)
+                            throw new Error("Branch ".concat(target_branch_name, " not found"));
+                        return [4 /*yield*/, this.api.branches().merge(sourceBrance.branch_id, { project_id: project_id }, {
+                                target_branch_id: targetBranch.branch_id,
+                                force_conflict_resolve_using: "source", // feat branch changes will win.,
                             })];
-                    case 4:
-                        res = _a.sent();
-                        if (res === null || res === void 0 ? void 0 : res.process_id)
-                            processes.push(res.process_id);
-                        _a.label = 5;
-                    case 5:
-                        _i++;
-                        return [3 /*break*/, 3];
-                    case 6: return [2 /*return*/, processes];
-                    case 7:
-                        error_1 = _a.sent();
-                        console.log(error_1);
-                        return [2 /*return*/, []];
-                    case 8: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    Lokalise.prototype.createTask = function (branch_name, lang) {
-        return __awaiter(this, void 0, void 0, function () {
-            var group, keys, error_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, this.getLanguageUserTranslationGroup(lang)];
-                    case 1:
-                        group = _a.sent();
-                        if (!group)
-                            throw new Error("No user group found for ".concat(lang));
-                        return [4 /*yield*/, this.getUpdatedBranchKeys(branch_name)];
                     case 2:
-                        keys = _a.sent();
-                        if (!keys || keys.length === 0) {
-                            core.info("No ".concat(lang.toUpperCase(), " keys found for ").concat(branch_name, ".. skipping task creation."));
-                            return [2 /*return*/, null];
-                        }
-                        return [2 /*return*/, this.api.tasks().create({
-                                title: "Update ".concat(lang.toUpperCase(), " - ").concat(branch_name),
-                                keys: keys,
-                                // !IMPORTANT: Data to be used in the webhook
-                                description: JSON.stringify({
-                                    owner: github_1.context.repo.owner,
-                                    repo: github_1.context.repo.repo,
-                                    pull_number: github_1.context.payload.pull_request.number,
-                                    ref: branch_name,
-                                }),
-                                languages: [
-                                    {
-                                        language_iso: lang,
-                                        groups: [group.group_id],
-                                    },
-                                ],
-                            }, { project_id: "".concat(project_id, ":").concat(branch_name) })];
+                        res = _d.sent();
+                        if (!(delete_branch_after_merge && res.branch_merged)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.deleteBranch(sourceBrance.branch_id)];
                     case 3:
-                        error_2 = _a.sent();
-                        console.log(error_2);
-                        return [2 /*return*/, null];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    Lokalise.prototype.getProjectLanguages = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.api.languages().list({ project_id: project_id })];
-            });
-        });
-    };
-    Lokalise.prototype.getUploadProcessStatus = function (process_id) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.api
-                        .queuedProcesses()
-                        .get(process_id, { project_id: "".concat(project_id, ":").concat(branch_name) })];
-            });
-        });
-    };
-    Lokalise.prototype.getUpdatedBranchKeys = function (branch_name) {
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.api.keys().list({
-                            project_id: "".concat(project_id, ":").concat(branch_name),
-                            filter_tags: branch_name,
-                        })];
-                    case 1:
-                        res = _a.sent();
-                        return [2 /*return*/, res.items.map(function (key) { return key.key_id; })];
-                }
-            });
-        });
-    };
-    Lokalise.prototype.getProjectUserGroups = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var project;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.api.projects().get(project_id)];
-                    case 1:
-                        project = _a.sent();
-                        return [2 /*return*/, this.api.userGroups().list({ team_id: project.team_id })];
-                }
-            });
-        });
-    };
-    Lokalise.prototype.getLanguageUserTranslationGroup = function (lang) {
-        return __awaiter(this, void 0, void 0, function () {
-            var groups;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getProjectUserGroups()];
-                    case 1:
-                        groups = _a.sent();
-                        return [2 /*return*/, groups.items.find(function (g) {
-                                return g.permissions.languages.find(function (l) { return l.is_writable && l.lang_iso === lang; });
-                            })];
+                        _d.sent();
+                        _d.label = 4;
+                    case 4: return [2 /*return*/, res];
                 }
             });
         });
@@ -265,73 +104,27 @@ var Lokalise = /** @class */ (function () {
 }());
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var lokalise, branch, processes, allCompleted, _i, processes_1, process_1, p, langs, targetLangs, _a, targetLangs_1, lang, err_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var lokalise, err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
-                    _b.trys.push([0, 14, , 15]);
+                    _a.trys.push([0, 2, , 3]);
                     lokalise = new Lokalise();
-                    console.log("[CREATING BRANCH]");
-                    return [4 /*yield*/, lokalise.createBranch(branch_name)];
+                    // Merge and delete branch
+                    return [4 /*yield*/, lokalise.mergeBranch({
+                            branch_name: branch_name,
+                            target_branch_name: "master",
+                            delete_branch_after_merge: true,
+                        })];
                 case 1:
-                    branch = _b.sent();
-                    console.log("[BRANCH CREATED]: ", branch.branch_id);
-                    console.log("[UPLOADING FILES]");
-                    return [4 /*yield*/, lokalise.upload(branch_name)];
+                    // Merge and delete branch
+                    _a.sent();
+                    return [3 /*break*/, 3];
                 case 2:
-                    processes = _b.sent();
-                    console.log("[PROCESSED FILES]: ", processes);
-                    console.log("[CHECKING PROCESS COMPLETION]");
-                    allCompleted = false;
-                    _b.label = 3;
-                case 3:
-                    allCompleted = true;
-                    _i = 0, processes_1 = processes;
-                    _b.label = 4;
-                case 4:
-                    if (!(_i < processes_1.length)) return [3 /*break*/, 7];
-                    process_1 = processes_1[_i];
-                    return [4 /*yield*/, lokalise.getUploadProcessStatus(process_1)];
-                case 5:
-                    p = _b.sent();
-                    console.log("[".concat(p.process_id, "] -> ").concat(p.status.toUpperCase()));
-                    if ((p === null || p === void 0 ? void 0 : p.status) !== "finished") {
-                        allCompleted = false;
-                    }
-                    _b.label = 6;
-                case 6:
-                    _i++;
-                    return [3 /*break*/, 4];
-                case 7:
-                    if (!allCompleted) return [3 /*break*/, 3];
-                    _b.label = 8;
-                case 8:
-                    console.log("[CREATE TASK X TARGET LANGUAGE]");
-                    return [4 /*yield*/, lokalise.getProjectLanguages()];
-                case 9:
-                    langs = _b.sent();
-                    targetLangs = langs.items.filter(function (lang) { return lang.lang_iso !== "it"; });
-                    console.log("[TARGET LANGUAGES] -> ".concat(targetLangs.map(function (l) { return l.lang_iso; })));
-                    _a = 0, targetLangs_1 = targetLangs;
-                    _b.label = 10;
-                case 10:
-                    if (!(_a < targetLangs_1.length)) return [3 /*break*/, 13];
-                    lang = targetLangs_1[_a];
-                    console.log("[CREATING ".concat(lang.lang_iso.toUpperCase(), " TASK]"));
-                    return [4 /*yield*/, lokalise.createTask(branch_name, lang.lang_iso)];
-                case 11:
-                    _b.sent();
-                    console.log("[SUCCESSFULLY CREATED ".concat(lang.lang_iso.toUpperCase(), " TASK]"));
-                    _b.label = 12;
-                case 12:
-                    _a++;
-                    return [3 /*break*/, 10];
-                case 13: return [3 /*break*/, 15];
-                case 14:
-                    err_1 = _b.sent();
+                    err_1 = _a.sent();
                     core.setFailed(err_1.message);
-                    return [3 /*break*/, 15];
-                case 15: return [2 /*return*/];
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
             }
         });
     });
@@ -31431,7 +31224,7 @@ class LokalisePkg {
     static async getVersion() {
         let pkg;
         try {
-            pkg = JSON.parse((await (0,promises_namespaceObject.readFile)(new URL(LokalisePkg.pkgPath(), "file:///Users/basilico/projects/lokalise-actions/translations-open-pr/node_modules/@lokalise/node-api/dist/lokalise/pkg.js"))).toString());
+            pkg = JSON.parse((await (0,promises_namespaceObject.readFile)(new URL(LokalisePkg.pkgPath(), "file:///Users/basilico/projects/lokalise-actions/modules/merge-branch/node_modules/@lokalise/node-api/dist/lokalise/pkg.js"))).toString());
         }
         catch (_e) {
             pkg = null;

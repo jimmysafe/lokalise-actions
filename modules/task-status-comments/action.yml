@@ -1,0 +1,5 @@
+name: "Tasks Handler"
+description: "Fires with Lokalise Task Webhook."
+runs:
+  using: "node20"
+  main: "dist/index.js"
