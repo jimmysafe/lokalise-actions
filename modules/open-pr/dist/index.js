@@ -225,6 +225,7 @@ var Lokalise = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.api.keys().list({
                             project_id: "".concat(project_id, ":").concat(branch_name),
                             filter_tags: branch_name,
+                            filter_untranslated: 1,
                         })];
                     case 1:
                         res = _a.sent();

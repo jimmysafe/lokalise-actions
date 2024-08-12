@@ -146,6 +146,7 @@ class Lokalise {
     const res = await this.api.keys().list({
       project_id: `${project_id}:${branch_name}`,
       filter_tags: branch_name,
+      filter_untranslated: 1,
     });
     return res.items.map((key) => key.key_id);
   }
