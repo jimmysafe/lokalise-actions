@@ -136,6 +136,7 @@ var Lokalise = /** @class */ (function () {
                                 filename: file.fileName,
                                 replace_modified: true,
                                 tags: [branch_name],
+                                use_automations: true, // !enables automation to google translate
                                 // cleanup_mode: true, // !enables deleted keys to be removed from file
                             })];
                     case 4:
