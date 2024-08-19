@@ -70,13 +70,13 @@ async function run() {
         false /* optional: set to `true` to enable updating existing pull requests */,
       labels: [
         "automerge",
-        "build-ignore",
-        "translations-check-ignore",
+        // "build-ignore",
+        // "translations-check-ignore",
       ] /* optional: applies the given labels when user has permissions. When updating an existing pull request, already present labels will not be deleted. */,
       changes: [
         {
           files: committedFiles,
-          commit: "lokalise update",
+          commit: "[ci skip]",
         },
       ],
     });
