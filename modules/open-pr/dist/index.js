@@ -331,9 +331,10 @@ function run() {
                 case 13: return [3 /*break*/, 15];
                 case 14:
                     err_1 = _b.sent();
-                    console.log(err_1.status);
-                    console.log(JSON.stringify(err_1));
-                    core.setFailed(err_1.message);
+                    if (err_1.code !== 400) {
+                        core.setFailed(err_1.message);
+                    }
+                    core.info(err_1.message);
                     return [3 /*break*/, 15];
                 case 15: return [2 /*return*/];
             }
