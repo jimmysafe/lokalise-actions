@@ -178,6 +178,7 @@ var Lokalise = /** @class */ (function () {
                         return [2 /*return*/, this.api.tasks().create({
                                 title: "Update ".concat(lang.toUpperCase(), " - ").concat(branch_name),
                                 keys: keys,
+                                task_type: "review",
                                 // !IMPORTANT: Data to be used in the webhook
                                 description: JSON.stringify({
                                     owner: github_1.context.repo.owner,
@@ -225,7 +226,7 @@ var Lokalise = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.api.keys().list({
                             project_id: "".concat(project_id, ":").concat(branch_name),
                             filter_tags: branch_name,
-                            filter_untranslated: 1,
+                            // filter_untranslated: 1,
                         })];
                     case 1:
                         res = _a.sent();
