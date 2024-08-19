@@ -201,6 +201,8 @@ async function run() {
       console.log(`[SUCCESSFULLY CREATED ${lang.lang_iso.toUpperCase()} TASK]`);
     }
   } catch (err) {
+    console.log(err.status);
+    console.log(JSON.stringify(err));
     core.setFailed(err.message);
   }
 }
