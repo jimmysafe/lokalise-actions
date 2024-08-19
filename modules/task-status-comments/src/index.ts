@@ -24,17 +24,16 @@ const branch_name = request.ref;
 function formatTaskStatus(status: string) {
   switch (status) {
     case "created":
+    case "in progress":
       return "🛠️ In Progress";
     case "completed":
       return "✅ Completed";
-    case "closed":
-      return "❌ Closed";
     default:
       return status;
   }
 }
 
-function getCommentTableRow(task: Task) {
+function getCommentTableRow(task: Task): string {
   return `| ${task.title} | ${formatTaskStatus(
     task.status
   )} | [Visit](https://app.lokalise.com/project/${project_id}/?view=multi&filter=task_${
@@ -42,69 +41,54 @@ function getCommentTableRow(task: Task) {
   }&branch=${branch_name ?? "master"}) |`;
 }
 
+async function generateBranchTasksTableRows(): Promise<string> {
+  const api = new LokaliseApi({
+    apiKey,
+  });
+
+  console.log("[RETRIEVING BRANCH TASKS]");
+  const branchTasks = await api
+    .tasks()
+    .list({ project_id: `${project_id}:${branch_name}` });
+
+  return branchTasks.items
+    .map((task) => {
+      return getCommentTableRow(task);
+    })
+    .join("\n");
+}
+
 async function run() {
   try {
-    const api = new LokaliseApi({
-      apiKey,
-    });
+    console.log("[TASK STATUS CHANGED FOR]: ", task_id);
+    const rows = await generateBranchTasksTableRows();
 
-    console.log("[RETRIEVING TASK] ", task_id);
-    const task = await api
-      .tasks()
-      .get(task_id, { project_id: `${project_id}:${branch_name}` });
-    if (!task) {
-      console.log("[TASK NOT FOUND] Exiting.");
-      return;
-    }
     console.log("[RETRIEVING PR COMMENTS]");
     const comments = await octokit.rest.issues.listComments({
       issue_number: request.pull_number,
       owner: request.owner,
       repo: request.repo,
     });
+
     console.log("[CHECKING COMMENT ALREADY EXISTS]");
     const comment = comments.data.find((c) =>
       c.body.includes("<!-- LOKALISE_TASKS -->")
     );
+
     if (!comment) {
-      console.log("[COMMENT NOT FOUND: Creating it..]");
+      console.log("[COMMENT NOT FOUND]: ", "Creating it..");
       await octokit.rest.issues.createComment({
         issue_number: request.pull_number,
         owner: request.owner,
         repo: request.repo,
-        body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${task_id}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${getCommentTableRow(
-          task
-        )}`,
+        body: `<!-- LOKALISE_TASKS -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${rows}`,
       });
     } else {
-      console.log("[COMMENT ALREADY EXISTS: Updating it..]");
-      const regex = /%([^%]+)%/;
-      const match = comment.body.match(regex);
-      if (!match) {
-        console.log("NO REGEX MATCH FOUND");
-        return;
-      }
-
-      const ids = JSON.parse(match[1]);
-      const newIds = [...ids, task_id].filter(Boolean).map((n) => Number(n));
-      const uniqueIds = [...new Set(newIds)];
-      console.log("NEW TASK IDS: ", uniqueIds);
-      const tableLines: string[] = [];
-      for (const id of uniqueIds) {
-        const task = await api
-          .tasks()
-          .get(id, { project_id: `${project_id}:${branch_name}` });
-        if (task) tableLines.push(getCommentTableRow(task));
-      }
-
+      console.log("[COMMENT ALREADY EXISTS]: ", "Updating it..");
       await octokit.rest.issues.updateComment({
         ...request,
         comment_id: comment.id,
-        body: `<!-- LOKALISE_TASKS -->\n<!-- taskIds: %[${uniqueIds.join(
-          ", "
-        )}]% -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${tableLines.join(
-          "\n"
-        )}`,
+        body: `<!-- LOKALISE_TASKS -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${rows}`,
       });
     }
   } catch (err) {
