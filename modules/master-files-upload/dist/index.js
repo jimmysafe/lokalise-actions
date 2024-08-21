@@ -116,7 +116,6 @@ var Lokalise = /** @class */ (function () {
                                 data: file.base64Content,
                                 filename: file.fileName,
                                 replace_modified: true,
-                                apply_tm: true,
                                 use_automations: true,
                             })];
                     case 4:
