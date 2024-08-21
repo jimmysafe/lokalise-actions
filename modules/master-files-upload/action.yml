@@ -1,0 +1,5 @@
+name: "Master - Upload Translation Files"
+description: "Run all actions needed when opening a PR with changed translations."
+runs:
+  using: "node20"
+  main: "dist/index.js"

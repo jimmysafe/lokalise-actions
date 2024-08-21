@@ -1,0 +1,61 @@
+name: Release translations
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        type: string
+        default: ubuntu-latest
+
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+
+# permissions:
+#   id-token: write
+#   contents: read
+#   pull-requests: write
+
+jobs:
+  process_translations:
+    name: Push and Pull Translations
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate a token
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.TRANSLATIONS_BOT_APP_ID }}
+          private_key: ${{ secrets.TRANSLATIONS_BOT_PRIVATE_KEY }}
+
+      - name: Push translations to Lokalise
+        uses: jimmysafe/lokalise-actions/modules/master-files-upload@main-v1
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+          LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
+          LOKALISE_PROJECT_ID: ${{ secrets.LOKALISE_PROJECT_ID }}
+        with:
+          lokaliseApiToken: ${{ env.LOKALISE_API_TOKEN }}
+          lokaliseProjectId: ${{ env.LOKALISE_PROJECT_ID }}
+          token: ${{ env.GH_TOKEN }}
+
+      - name: Install Lokalise CLI
+        uses: frenck/action-setup-lokalise@v1
+
+      - name: Download Translations
+        env:
+          LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
+          LOKALISE_PROJECT_ID: ${{ secrets.LOKALISE_PROJECT_ID }}
+        run: |
+          lokalise2 \
+            --token ${{ env.LOKALISE_API_TOKEN }} \
+            --project-id ${{ env.LOKALISE_PROJECT_ID }}:master \
+            file download \
+            --format json \
+            --plural-format i18next \
+            --placeholder-format i18n \
+            --indentation 4sp \
+            --unzip-to ./locales
