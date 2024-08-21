@@ -20,6 +20,7 @@ const request = JSON.parse(gh_data) as {
 };
 
 const branch_name = request.ref;
+const LOG = console.log;
 
 function formatTaskStatus(status: string) {
   switch (status) {
@@ -47,7 +48,7 @@ async function generateBranchTasksTableRows(): Promise<string> {
     apiKey,
   });
 
-  console.log("[RETRIEVING BRANCH TASKS]");
+  LOG("[RETRIEVING BRANCH TASKS]");
   const branchTasks = await api
     .tasks()
     .list({ project_id: `${project_id}:${branch_name}` });
@@ -61,23 +62,23 @@ async function generateBranchTasksTableRows(): Promise<string> {
 
 async function run() {
   try {
-    console.log("[TASK STATUS CHANGED FOR]: ", task_id);
+    LOG("[TASK STATUS CHANGED FOR]: ", task_id);
     const rows = await generateBranchTasksTableRows();
 
-    console.log("[RETRIEVING PR COMMENTS]");
+    LOG("[RETRIEVING PR COMMENTS]");
     const comments = await octokit.rest.issues.listComments({
       issue_number: request.pull_number,
       owner: request.owner,
       repo: request.repo,
     });
 
-    console.log("[CHECKING COMMENT ALREADY EXISTS]");
+    LOG("[CHECKING COMMENT ALREADY EXISTS]");
     const comment = comments.data.find((c) =>
       c.body.includes("<!-- LOKALISE_TASKS -->")
     );
 
     if (!comment) {
-      console.log("[COMMENT NOT FOUND]: ", "Creating it..");
+      LOG("[COMMENT NOT FOUND]: ", "Creating it..");
       await octokit.rest.issues.createComment({
         issue_number: request.pull_number,
         owner: request.owner,
@@ -85,7 +86,7 @@ async function run() {
         body: `<!-- LOKALISE_TASKS -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${rows}`,
       });
     } else {
-      console.log("[COMMENT ALREADY EXISTS]: ", "Updating it..");
+      LOG("[COMMENT ALREADY EXISTS]: ", "Updating it..");
       await octokit.rest.issues.updateComment({
         ...request,
         comment_id: comment.id,

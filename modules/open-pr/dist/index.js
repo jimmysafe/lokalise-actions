@@ -368,6 +368,7 @@ var ghToken = core.getInput("token");
 var apiKey = core.getInput("lokaliseApiToken");
 var project_id = core.getInput("lokaliseProjectId");
 var branch_name = github_1.context.payload.pull_request.head.ref;
+var LOG = console.log;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var lokalise, branch, processes, allCompleted, _i, processes_1, process_1, p, langs, targetLangs, _a, targetLangs_1, lang, err_1;
@@ -380,17 +381,17 @@ function run() {
                         project_id: project_id,
                         ghToken: ghToken,
                     });
-                    console.log("[CREATING BRANCH]");
+                    LOG("[CREATING BRANCH]");
                     return [4 /*yield*/, lokalise.createBranch(branch_name)];
                 case 1:
                     branch = _b.sent();
-                    console.log("[BRANCH CREATED]: ", branch.branch_id);
-                    console.log("[UPLOADING FILES]");
+                    LOG("[BRANCH CREATED]: ", branch.branch_id);
+                    LOG("[UPLOADING FILES]");
                     return [4 /*yield*/, lokalise.upload(branch_name)];
                 case 2:
                     processes = _b.sent();
-                    console.log("[PROCESSED FILES]: ", processes);
-                    console.log("[CHECKING PROCESS COMPLETION]");
+                    LOG("[PROCESSED FILES]: ", processes);
+                    LOG("[CHECKING PROCESS COMPLETION]");
                     allCompleted = false;
                     _b.label = 3;
                 case 3:
@@ -403,7 +404,7 @@ function run() {
                     return [4 /*yield*/, lokalise.getUploadProcessStatus(branch_name, process_1)];
                 case 5:
                     p = _b.sent();
-                    console.log("[".concat(p.process_id, "] -> ").concat(p.status.toUpperCase()));
+                    LOG("[".concat(p.process_id, "] -> ").concat(p.status.toUpperCase()));
                     if ((p === null || p === void 0 ? void 0 : p.status) !== "finished") {
                         allCompleted = false;
                     }
@@ -415,22 +416,22 @@ function run() {
                     if (!allCompleted) return [3 /*break*/, 3];
                     _b.label = 8;
                 case 8:
-                    console.log("[CREATE TASK X TARGET LANGUAGE]");
+                    LOG("[CREATE TASK X TARGET LANGUAGE]");
                     return [4 /*yield*/, lokalise.getProjectLanguages()];
                 case 9:
                     langs = _b.sent();
                     targetLangs = langs.items.filter(function (lang) { return lang.lang_iso !== "it"; });
-                    console.log("[TARGET LANGUAGES] -> ".concat(targetLangs.map(function (l) { return l.lang_iso; })));
+                    LOG("[TARGET LANGUAGES] -> ".concat(targetLangs.map(function (l) { return l.lang_iso; })));
                     _a = 0, targetLangs_1 = targetLangs;
                     _b.label = 10;
                 case 10:
                     if (!(_a < targetLangs_1.length)) return [3 /*break*/, 13];
                     lang = targetLangs_1[_a];
-                    console.log("[CREATING ".concat(lang.lang_iso.toUpperCase(), " TASK]"));
+                    LOG("[CREATING ".concat(lang.lang_iso.toUpperCase(), " TASK]"));
                     return [4 /*yield*/, lokalise.createTask(branch_name, lang.lang_iso)];
                 case 11:
                     _b.sent();
-                    console.log("[SUCCESSFULLY CREATED ".concat(lang.lang_iso.toUpperCase(), " TASK]"));
+                    LOG("[SUCCESSFULLY CREATED ".concat(lang.lang_iso.toUpperCase(), " TASK]"));
                     _b.label = 12;
                 case 12:
                     _a++;

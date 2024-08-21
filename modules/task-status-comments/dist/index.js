@@ -28,6 +28,7 @@ const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
 const request = JSON.parse(gh_data);
 const branch_name = request.ref;
+const LOG = console.log;
 function formatTaskStatus(status) {
     switch (status) {
         case "created":
@@ -48,7 +49,7 @@ function generateBranchTasksTableRows() {
         const api = new node_api_1.LokaliseApi({
             apiKey,
         });
-        console.log("[RETRIEVING BRANCH TASKS]");
+        LOG("[RETRIEVING BRANCH TASKS]");
         const branchTasks = yield api
             .tasks()
             .list({ project_id: `${project_id}:${branch_name}` });
@@ -62,18 +63,18 @@ function generateBranchTasksTableRows() {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log("[TASK STATUS CHANGED FOR]: ", task_id);
+            LOG("[TASK STATUS CHANGED FOR]: ", task_id);
             const rows = yield generateBranchTasksTableRows();
-            console.log("[RETRIEVING PR COMMENTS]");
+            LOG("[RETRIEVING PR COMMENTS]");
             const comments = yield octokit.rest.issues.listComments({
                 issue_number: request.pull_number,
                 owner: request.owner,
                 repo: request.repo,
             });
-            console.log("[CHECKING COMMENT ALREADY EXISTS]");
+            LOG("[CHECKING COMMENT ALREADY EXISTS]");
             const comment = comments.data.find((c) => c.body.includes("<!-- LOKALISE_TASKS -->"));
             if (!comment) {
-                console.log("[COMMENT NOT FOUND]: ", "Creating it..");
+                LOG("[COMMENT NOT FOUND]: ", "Creating it..");
                 yield octokit.rest.issues.createComment({
                     issue_number: request.pull_number,
                     owner: request.owner,
@@ -82,7 +83,7 @@ function run() {
                 });
             }
             else {
-                console.log("[COMMENT ALREADY EXISTS]: ", "Updating it..");
+                LOG("[COMMENT ALREADY EXISTS]: ", "Updating it..");
                 yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, request), { comment_id: comment.id, body: `<!-- LOKALISE_TASKS -->\n| Name | Status | Preview\n| :--- | :----- | :------ |\n${rows}` }));
             }
         }

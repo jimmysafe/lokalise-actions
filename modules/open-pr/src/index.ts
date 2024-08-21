@@ -8,6 +8,8 @@ const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
 const branch_name = context.payload.pull_request.head.ref;
 
+const LOG = console.log;
+
 async function run() {
   try {
     const lokalise = new Lokalise({
@@ -16,36 +18,36 @@ async function run() {
       ghToken,
     });
 
-    console.log("[CREATING BRANCH]");
+    LOG("[CREATING BRANCH]");
     const branch = await lokalise.createBranch(branch_name);
-    console.log("[BRANCH CREATED]: ", branch.branch_id);
+    LOG("[BRANCH CREATED]: ", branch.branch_id);
 
-    console.log("[UPLOADING FILES]");
+    LOG("[UPLOADING FILES]");
     const processes = await lokalise.upload(branch_name);
-    console.log("[PROCESSED FILES]: ", processes);
+    LOG("[PROCESSED FILES]: ", processes);
 
-    console.log("[CHECKING PROCESS COMPLETION]");
+    LOG("[CHECKING PROCESS COMPLETION]");
     let allCompleted = false;
     do {
       allCompleted = true;
       for (const process of processes) {
         const p = await lokalise.getUploadProcessStatus(branch_name, process);
-        console.log(`[${p.process_id}] -> ${p.status.toUpperCase()}`);
+        LOG(`[${p.process_id}] -> ${p.status.toUpperCase()}`);
         if (p?.status !== "finished") {
           allCompleted = false;
         }
       }
     } while (!allCompleted);
 
-    console.log("[CREATE TASK X TARGET LANGUAGE]");
+    LOG("[CREATE TASK X TARGET LANGUAGE]");
     const langs = await lokalise.getProjectLanguages();
     const targetLangs = langs.items.filter((lang) => lang.lang_iso !== "it");
-    console.log(`[TARGET LANGUAGES] -> ${targetLangs.map((l) => l.lang_iso)}`);
+    LOG(`[TARGET LANGUAGES] -> ${targetLangs.map((l) => l.lang_iso)}`);
 
     for (const lang of targetLangs) {
-      console.log(`[CREATING ${lang.lang_iso.toUpperCase()} TASK]`);
+      LOG(`[CREATING ${lang.lang_iso.toUpperCase()} TASK]`);
       await lokalise.createTask(branch_name, lang.lang_iso);
-      console.log(`[SUCCESSFULLY CREATED ${lang.lang_iso.toUpperCase()} TASK]`);
+      LOG(`[SUCCESSFULLY CREATED ${lang.lang_iso.toUpperCase()} TASK]`);
     }
   } catch (err) {
     if (err.code !== 400) {
