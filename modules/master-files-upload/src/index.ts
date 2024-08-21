@@ -59,8 +59,7 @@ class Lokalise {
           data: file.base64Content,
           filename: file.fileName,
           replace_modified: true,
-          // use_automations: true,
-          apply_tm: true,
+          use_automations: true,
         });
         if (res?.process_id) processes.push(res.process_id);
       }
