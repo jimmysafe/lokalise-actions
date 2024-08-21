@@ -110,7 +110,7 @@ var Lokalise = /** @class */ (function () {
                     case 3:
                         if (!(_i < base64Files_1.length)) return [3 /*break*/, 6];
                         file = base64Files_1[_i];
-                        return [4 /*yield*/, this.api.files().upload("".concat(project_id), {
+                        return [4 /*yield*/, this.api.files().upload("".concat(project_id, ":master"), {
                                 format: "json",
                                 lang_iso: "it",
                                 data: file.base64Content,
@@ -141,7 +141,7 @@ var Lokalise = /** @class */ (function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, this.api
                         .queuedProcesses()
-                        .get(process_id, { project_id: "".concat(project_id) })];
+                        .get(process_id, { project_id: "".concat(project_id, ":master") })];
             });
         });
     };
