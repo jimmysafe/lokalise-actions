@@ -6,5 +6,5 @@
 git add . && 
 git commit -m 'build' && 
 git push origin main &&
-./scripts/minor-release.sh &&
-./scripts/deploy.sh
+./scripts/minor-release.sh
+# ./scripts/deploy.sh
