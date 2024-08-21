@@ -1,5 +1,6 @@
 import {
   Branch,
+  BranchMerged,
   Language,
   LokaliseApi,
   PaginatedResult,
@@ -15,7 +16,7 @@ import { UploadFileParams } from "./types";
 type LokaliseParams = {
   apiKey: string;
   project_id: string;
-  ghToken: string;
+  ghToken?: string;
 };
 
 export class Lokalise {
@@ -39,6 +40,16 @@ export class Lokalise {
     };
   }
 
+  private async getProjectBranches(): Promise<PaginatedResult<Branch>> {
+    return this.api.branches().list({ project_id: this.project_id });
+  }
+
+  private async deleteBranch(branch_id: number): Promise<any> {
+    return this.api
+      .branches()
+      .delete(branch_id, { project_id: this.project_id });
+  }
+
   private async getUpdatedBranchKeys(branch_name: string): Promise<number[]> {
     const res = await this.api.keys().list({
       project_id: `${this.project_id}:${branch_name}`,
@@ -58,6 +69,38 @@ export class Lokalise {
     return groups.items.find((g) =>
       g.permissions.languages.find((l) => l.is_writable && l.lang_iso === lang)
     );
+  }
+
+  public async mergeBranch({
+    branch_name,
+    target_branch_name,
+    delete_branch_after_merge = false,
+  }: {
+    branch_name: string;
+    target_branch_name: string;
+    delete_branch_after_merge?: boolean;
+  }): Promise<BranchMerged> {
+    const branches = await this.getProjectBranches();
+    const sourceBrance = branches.items.find((b) => b.name === branch_name);
+    const targetBranch = branches.items.find(
+      (b) => b.name === target_branch_name
+    );
+    if (!sourceBrance) throw new Error(`Branch ${branch_name} not found`);
+    if (!targetBranch)
+      throw new Error(`Branch ${target_branch_name} not found`);
+
+    const res = await this.api.branches().merge(
+      sourceBrance.branch_id,
+      { project_id: this.project_id },
+      {
+        target_branch_id: targetBranch.branch_id,
+        force_conflict_resolve_using: "source", // feat branch changes will win.,
+      }
+    );
+    if (delete_branch_after_merge && res.branch_merged) {
+      await this.deleteBranch(sourceBrance.branch_id);
+    }
+    return res;
   }
 
   public async createBranch(branch_name: string): Promise<Branch> {

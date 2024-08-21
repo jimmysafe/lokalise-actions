@@ -77,6 +77,22 @@ var Lokalise = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Lokalise.prototype.getProjectBranches = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.api.branches().list({ project_id: this.project_id })];
+            });
+        });
+    };
+    Lokalise.prototype.deleteBranch = function (branch_id) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.api
+                        .branches()
+                        .delete(branch_id, { project_id: this.project_id })];
+            });
+        });
+    };
     Lokalise.prototype.getUpdatedBranchKeys = function (branch_name) {
         return __awaiter(this, void 0, void 0, function () {
             var res;
@@ -118,6 +134,37 @@ var Lokalise = /** @class */ (function () {
                         return [2 /*return*/, groups.items.find(function (g) {
                                 return g.permissions.languages.find(function (l) { return l.is_writable && l.lang_iso === lang; });
                             })];
+                }
+            });
+        });
+    };
+    Lokalise.prototype.mergeBranch = function (_a) {
+        return __awaiter(this, arguments, void 0, function (_b) {
+            var branches, sourceBrance, targetBranch, res;
+            var branch_name = _b.branch_name, target_branch_name = _b.target_branch_name, _c = _b.delete_branch_after_merge, delete_branch_after_merge = _c === void 0 ? false : _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0: return [4 /*yield*/, this.getProjectBranches()];
+                    case 1:
+                        branches = _d.sent();
+                        sourceBrance = branches.items.find(function (b) { return b.name === branch_name; });
+                        targetBranch = branches.items.find(function (b) { return b.name === target_branch_name; });
+                        if (!sourceBrance)
+                            throw new Error("Branch ".concat(branch_name, " not found"));
+                        if (!targetBranch)
+                            throw new Error("Branch ".concat(target_branch_name, " not found"));
+                        return [4 /*yield*/, this.api.branches().merge(sourceBrance.branch_id, { project_id: this.project_id }, {
+                                target_branch_id: targetBranch.branch_id,
+                                force_conflict_resolve_using: "source", // feat branch changes will win.,
+                            })];
+                    case 2:
+                        res = _d.sent();
+                        if (!(delete_branch_after_merge && res.branch_merged)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.deleteBranch(sourceBrance.branch_id)];
+                    case 3:
+                        _d.sent();
+                        _d.label = 4;
+                    case 4: return [2 /*return*/, res];
                 }
             });
         });
