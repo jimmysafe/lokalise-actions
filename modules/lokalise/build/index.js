@@ -53,7 +53,8 @@ var github_1 = require("@actions/github");
 var core = require("@actions/core");
 var Lokalise = /** @class */ (function () {
     function Lokalise(params) {
-        this.octokit = (0, github_1.getOctokit)(params.ghToken);
+        if (params.ghToken)
+            this.octokit = (0, github_1.getOctokit)(params.ghToken);
         this.project_id = params.project_id;
         this.api = new node_api_1.LokaliseApi({
             apiKey: params.apiKey,

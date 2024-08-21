@@ -25,7 +25,7 @@ export class Lokalise {
   octokit: InstanceType<typeof GitHub>;
 
   constructor(params: LokaliseParams) {
-    this.octokit = getOctokit(params.ghToken);
+    if (params.ghToken) this.octokit = getOctokit(params.ghToken);
     this.project_id = params.project_id;
     this.api = new LokaliseApi({
       apiKey: params.apiKey,
