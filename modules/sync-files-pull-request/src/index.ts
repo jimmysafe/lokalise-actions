@@ -42,8 +42,6 @@ async function run() {
     const zipUrl = response.bundle_url;
     const _temp = path.join(path.resolve(), `temp-${new Date().getTime()}`);
 
-    // const zipResponse = await fetch(zipUrl);
-    // const zipBuffer = await zipResponse.buffer();
     const zipResponse = await fetch(zipUrl);
     const arrayBuffer = await zipResponse.arrayBuffer();
     const zipBuffer = Buffer.from(arrayBuffer);
@@ -70,13 +68,11 @@ async function run() {
         false /* optional: set to `true` to enable updating existing pull requests */,
       labels: [
         "automerge",
-        // "build-ignore",
-        // "translations-check-ignore",
       ] /* optional: applies the given labels when user has permissions. When updating an existing pull request, already present labels will not be deleted. */,
       changes: [
         {
           files: committedFiles,
-          commit: "[ci skip]",
+          commit: "[ci skip]", // skips all actions
         },
       ],
     });
