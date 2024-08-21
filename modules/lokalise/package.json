@@ -1,11 +1,10 @@
 {
-  "name": "master-files-upload",
+  "name": "lokalise",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && ./build.sh",
-    "_build": "tsc && ncc build build/index.js"
+    "build": "tsc && ncc build build/index.js"
   },
   "keywords": [],
   "author": "",
