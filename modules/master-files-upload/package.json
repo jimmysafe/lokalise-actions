@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && ./build.sh",
-    "_build": "tsc && ncc build build/index.js"
+    "build": "tsc && ./build.sh"
   },
   "keywords": [],
   "author": "",
