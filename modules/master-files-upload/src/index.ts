@@ -53,7 +53,7 @@ class Lokalise {
 
       let processes = [];
       for (const file of base64Files) {
-        const res = await this.api.files().upload(`${project_id}:master`, {
+        const res = await this.api.files().upload(`${project_id}`, {
           format: "json",
           lang_iso: "it",
           data: file.base64Content,
@@ -76,7 +76,7 @@ class Lokalise {
   ): Promise<QueuedProcess> {
     return this.api
       .queuedProcesses()
-      .get(process_id, { project_id: `${project_id}:master` });
+      .get(process_id, { project_id: `${project_id}` });
   }
 }
 
