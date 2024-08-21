@@ -52,11 +52,11 @@ var node_api_1 = require("@lokalise/node-api");
 var github_1 = require("@actions/github");
 var core = require("@actions/core");
 var Lokalise = /** @class */ (function () {
-    function Lokalise(apiKey, project_id, ghToken) {
-        this.octokit = (0, github_1.getOctokit)(ghToken);
-        this.project_id = project_id;
+    function Lokalise(params) {
+        this.octokit = (0, github_1.getOctokit)(params.ghToken);
+        this.project_id = params.project_id;
         this.api = new node_api_1.LokaliseApi({
-            apiKey: apiKey,
+            apiKey: params.apiKey,
         });
     }
     Object.defineProperty(Lokalise.prototype, "request", {

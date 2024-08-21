@@ -59,11 +59,11 @@ var node_api_1 = __nccwpck_require__(8669);
 var github_1 = __nccwpck_require__(5438);
 var core = __nccwpck_require__(2186);
 var Lokalise = /** @class */ (function () {
-    function Lokalise(apiKey, project_id, ghToken) {
-        this.octokit = (0, github_1.getOctokit)(ghToken);
-        this.project_id = project_id;
+    function Lokalise(params) {
+        this.octokit = (0, github_1.getOctokit)(params.ghToken);
+        this.project_id = params.project_id;
         this.api = new node_api_1.LokaliseApi({
-            apiKey: apiKey,
+            apiKey: params.apiKey,
         });
     }
     Object.defineProperty(Lokalise.prototype, "request", {

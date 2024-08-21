@@ -12,16 +12,22 @@ import { GitHub } from "@actions/github/lib/utils";
 import * as core from "@actions/core";
 import { UploadFileParams } from "./types";
 
+type LokaliseParams = {
+  apiKey: string;
+  project_id: string;
+  ghToken: string;
+};
+
 export class Lokalise {
   api: LokaliseApi;
   project_id: string;
   octokit: InstanceType<typeof GitHub>;
 
-  constructor(apiKey: string, project_id: string, ghToken: string) {
-    this.octokit = getOctokit(ghToken);
-    this.project_id = project_id;
+  constructor(params: LokaliseParams) {
+    this.octokit = getOctokit(params.ghToken);
+    this.project_id = params.project_id;
     this.api = new LokaliseApi({
-      apiKey,
+      apiKey: params.apiKey,
     });
   }
 

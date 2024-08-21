@@ -9,7 +9,7 @@ const LOG = console.log;
 
 async function run() {
   try {
-    const lokalise = new Lokalise(apiKey, project_id, ghToken);
+    const lokalise = new Lokalise({ apiKey, project_id, ghToken });
 
     LOG("[UPLOADING FILES]");
     const processes = await lokalise.upload("master", {
