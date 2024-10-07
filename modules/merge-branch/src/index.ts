@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import { context } from "@actions/github";
 import { Lokalise } from "../../lokalise/src";
+
 const apiKey = core.getInput("lokaliseApiToken");
 const project_id = core.getInput("lokaliseProjectId");
 const branch_name = context.payload.pull_request.head.ref;
